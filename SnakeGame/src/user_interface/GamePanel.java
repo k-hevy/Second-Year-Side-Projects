@@ -13,6 +13,7 @@ import objects.Food;
 import objects.Snake;
 import objects.Tile;
 import objects.GameState;
+import objects.Obstacle;
 
 import Controls.InputManager;
 
@@ -41,8 +42,10 @@ public class GamePanel extends JPanel implements ActionListener {
     Snake snake;
     Food food;
     Tile tile;
+    Obstacle obstacle;
 
     InputManager input;
+
     // Game logic
     Timer gameLoop;
 
@@ -62,6 +65,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
         snake = new Snake(12, 5);
         food = new Food(snake, boardWidth, boardHeight, tileSize);
+        obstacle = new Obstacle(snake, tileSize);
+        obstacle.generateObstacles();
 
         input = new InputManager(snake, this);
         input.setUpInput(this);
@@ -91,29 +96,30 @@ public class GamePanel extends JPanel implements ActionListener {
 
             Tile snakePart = snake.getBody().get(i);
 
-            if (snake.getHead().getX() == snakePart.getX() && snake.getHead().getY() == snakePart.getY()) {
-                return true;
-            }
+            if (snake.getHead().getX() == snakePart.getX() && snake.getHead().getY() == snakePart.getY()) return true;
+            
 
-        }
+        } // move this to snake, make methods acccept snake
 
-        if (snake.getHead().getX() >= boardWidth/tileSize || snake.getHead().getX() * tileSize < 0 || 
-                snake.getHead().getY() >= boardHeight/tileSize || snake.getHead().getY() * tileSize < 0) {
-                return true;
-            }
+        if (snake.getHead().getX() >= boardWidth/tileSize || snake.getHead().getX() * tileSize < 0 || snake.getHead().getY() >= boardHeight/tileSize || snake.getHead().getY() * tileSize < 0) return true;
+        if (obstacle.checkSnakeObtstacleCollision(snake)) return true; 
 
         return false;
-    }
+    } // also move this to snake
 
     public void resetGame() {
 
         score = 0;
+        level = 1;
+
         snake.reset();
         food.reset();
+        obstacle.reset();
+
         gameLoop.start();
         gameLoop.setDelay(startDelay);
         delay = 140;
-        level = 1;
+        
         repaint();
 
     }
@@ -188,6 +194,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     snake.draw(g, tileSize);
     food.draw(g, tileSize);
+    obstacle.drawObstacles(g, tileSize);
 
     g.setColor(Color.BLUE);
     
@@ -199,6 +206,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    //features 
+
+    
     // visual painting
     public void paintComponent(Graphics g) {
 
