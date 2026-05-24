@@ -80,101 +80,9 @@ public class GamePanel extends JPanel implements ActionListener {
     @Override 
     public void actionPerformed(ActionEvent e) {
 
-        System.out.println(parent.getGameState());
-
-        if (parent.getGameState() == GameState.PLAYING) {
-
-            move();
-
-            if (gameOver()) {
-                gameLoop.stop();
-                parent.showGameOver();
-            }
-
-        }
-
+        update();
         repaint();
         
-    }
-
-    // visual painting
-    public void paintComponent(Graphics g) {
-
-        super.paintComponent(g);
-
-        if (parent.getGameState() == GameState.PAUSED) {
-            drawPausedOverlay(g);
-        }
-
-        draw(g);
-    
-    }
-
-    private void drawPausedOverlay(Graphics g) {
-        g.setColor(new Color(0, 0, 0, 150));
-        g.fillRect(0, 0, getWidth(), getHeight());
-
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 30));
-
-        FontMetrics fm = g.getFontMetrics();
-
-        String text = "PAUSED";
-        int x = (getWidth() - fm.stringWidth(text)) / 2;
-        int y = getHeight()/2;
-
-        g.drawString(text, x, y);
-        g.drawString("Press 'P' To Continue.", getWidth() - 450, getHeight()/2 + 40);
-    }
-
-    public void draw(Graphics g) {
-
-        //border lines 
-        for (int i =0; i < boardWidth/tileSize; i++) {
-            // x1, y1, x2, y2
-            g.drawLine(i*tileSize, 0, i*tileSize, boardHeight);
-            g.drawLine(0, i*tileSize, boardWidth, i*tileSize);
-        }
-
-        snake.draw(g, tileSize);
-        food.draw(g, tileSize);
-
-        // score
-        g.setFont(new Font("Arial", Font.PLAIN, 16));
-
-        if (gameOver()) {
-            g.setColor(Color.red);
-            g.drawString("Gameover: " + String.valueOf(snake.getBody().size()), tileSize - 16, tileSize);
-        } else {
-            g.drawString("Score: " + score, tileSize - 16, tileSize);
-            g.drawString("Highscore: " + highscore, tileSize - 16 , tileSize + 25);
-            g.drawString("Level: " + level, tileSize - 16 , tileSize + 50);
-            g.drawString("Speed: " + delay, tileSize - 16 , tileSize + 75);
-        }
-
-    }
-
-    // Game logic
-    public void move() {
-
-        snake.move();
-
-        if (snake.eats(food)) {
-            score++;
-            food.randomizeFood();
-            snake.grow();
-
-            if (score % 5 == 0 && delay > minDelay) {
-                level++;
-                System.out.println(delay);
-                delay -= 4;
-                gameLoop.setDelay(delay);
-            }
-        }
-
-        if (score > highscore) {
-            updateHighscore();
-        }
     }
 
     public boolean gameOver() {
@@ -246,5 +154,89 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
     
+    // Game Logic
+    public void update() {
+
+        if (gameOver()) {
+                gameLoop.stop();
+                parent.showGameOver();
+            }
+
+        if (parent.getGameState() != GameState.PLAYING) return;
+
+        snake.move();
+
+        if (snake.eats(food)) {
+            score++;
+            food.randomizeFood();
+            snake.grow();
+
+            if (score % 5 == 0 && delay > minDelay) {
+                level++;
+                delay -= 4;
+                gameLoop.setDelay(delay);
+            }
+
+        }
+
+        if (score > highscore) updateHighscore();
+        
+
+    }   
+
+    public void render(Graphics g) {
+
+    snake.draw(g, tileSize);
+    food.draw(g, tileSize);
+
+    g.setColor(Color.BLUE);
+    
+    // score
+    g.setFont(new Font("Arial", Font.PLAIN, 16));
+    drawHudAndScores(g);
+
+    if (parent.getGameState() == GameState.PAUSED) drawPausedOverlay(g);
+
+    }
+
+    // visual painting
+    public void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+        render(g);
+    
+    }
+
+    public void drawHudAndScores(Graphics g) {
+        for (int i =0; i < boardWidth/tileSize; i++) {
+                // x1, y1, x2, y2
+                g.drawLine(i*tileSize, 0, i*tileSize, boardHeight);
+                g.drawLine(0, i*tileSize, boardWidth, i*tileSize);
+            }
+
+        g.setColor(Color.WHITE);
+        g.drawString("Score: " + score, tileSize - 16, tileSize);
+        g.drawString("Highscore: " + highscore, tileSize - 16 , tileSize + 25);
+        g.drawString("Level: " + level, tileSize - 16 , tileSize + 50);
+        g.drawString("Speed: " + delay, tileSize - 16 , tileSize + 75);
+        
+    }
+
+    private void drawPausedOverlay(Graphics g) {
+        g.setColor(new Color(0, 0, 0, 150));
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 30));
+
+        FontMetrics fm = g.getFontMetrics();
+
+        String text = "PAUSED";
+        int x = (getWidth() - fm.stringWidth(text)) / 2;
+        int y = getHeight()/2;
+
+        g.drawString(text, x, y);
+        g.drawString("Press 'P' To Continue.", getWidth() - 450, getHeight()/2 + 40);
+    }
 
 }
