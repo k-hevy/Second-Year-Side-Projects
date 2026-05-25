@@ -8,14 +8,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Random;
 
 import objects.Food;
 import objects.Snake;
 import objects.Tile;
+import objects.PowerUp_Effects.PowerUps;
+import objects.PowerUp_Effects.PowerUps_BigPoints;
+import objects.PowerUp_Effects.PowerUps_DoublePoints;
+import objects.PowerUp_Effects.PowerUps_SpeedBoost;
 import objects.GameState;
 import objects.Obstacle;
-import objects.PowerUps;
-
 import Controls.InputManager;
 
 
@@ -35,6 +39,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     CardLayout layout;
     JPanel mainPanel;
+    Random random;
 
     int score;
     private int highscore;
@@ -45,12 +50,17 @@ public class GamePanel extends JPanel implements ActionListener {
     Tile tile;
     Obstacle obstacle;
     PowerUps powerUps;
+    
+
+    ArrayList<Tile> blockedTiles;
 
     InputManager input;
 
     private boolean boostActive = false;
+    private int multiplier = 1;
     private long powerUpEndTime = 0;
     private long nextPowerUpSpawnTime = 0;
+    private PowerUps currentPowerUp;
 
     // Game logic
     Timer gameLoop;
@@ -68,14 +78,15 @@ public class GamePanel extends JPanel implements ActionListener {
         setPreferredSize(new Dimension(this.boardWidth, this.boardHeight));
         setBackground(Color.BLACK);
         setFocusable(true);
-
         snake = new Snake(12, 5);
         food = new Food(snake, boardWidth, boardHeight, tileSize);
-        powerUps = new PowerUps(tileSize, boardWidth, boardHeight);
+        random = new Random();
+        //powerUps = new PowerUps(tileSize, boardWidth, boardHeight);
         obstacle = new Obstacle(tileSize, boardWidth, boardHeight);
         obstacle.generateObstacles();
-        nextPowerUpSpawnTime = powerUps.scheduleNextPowerUp();
 
+        blockedTiles = new ArrayList<Tile>();
+        scheduleNextPowerUp();
         input = new InputManager(snake, this);
         input.setUpInput(this);
 
@@ -111,12 +122,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
         score = 0;
         level = 1;
-        nextPowerUpSpawnTime = powerUps.scheduleNextPowerUp();
+        scheduleNextPowerUp();
 
         snake.reset();
         food.reset();
         obstacle.reset();
-        powerUps.reset();
+        currentPowerUp.resetPosition();
 
         gameLoop.start();
         gameLoop.setDelay(startDelay);
@@ -173,7 +184,7 @@ public class GamePanel extends JPanel implements ActionListener {
         if (parent.getGameState() != GameState.PLAYING) return;
 
         if (snake.eats(food)) {
-            score++;
+            score = score + (1 * multiplier);
             food.randomizeFood();
             snake.grow();
 
@@ -187,33 +198,110 @@ public class GamePanel extends JPanel implements ActionListener {
 
         if (score > highscore) updateHighscore();
 
-        if (System.currentTimeMillis() > nextPowerUpSpawnTime) {
-            powerUps.randomizePowerUp(snake, obstacle);
-            nextPowerUpSpawnTime = powerUps.scheduleNextPowerUp();
+        if (System.currentTimeMillis() >=  nextPowerUpSpawnTime &&  currentPowerUp == null ) {
+            scheduleNextPowerUp(); // schdules when next powerUp spawns
+            currentPowerUp = spawnpowerUps(); // chooses poweUp type and position
         }
-        
-        if (powerUps.isCollected(snake)) {
-            powerUps.reset();
+
+        if (isCollected(snake) && currentPowerUp != null) {
+
             boostActive = true;
-            powerUpEndTime = System.currentTimeMillis() + 5000;
-            gameLoop.setDelay(80);
+
+            currentPowerUp.resetPosition();
+            currentPowerUp = null;
+
+            currentPowerUp.applyPowerUp(this);
+        
         }
 
         if (boostActive && System.currentTimeMillis() > powerUpEndTime) {
             boostActive = false;
+            multiplier = 1;
             gameLoop.setDelay(delay);
-        }
-
+        } // speedBoost
+        
         snake.move();
 
     }   
+
+    public void setBoostActive (boolean value) {
+        boostActive = value;
+    }
+
+    public void setPopowerUpEndTime (long num) {
+        powerUpEndTime = num;
+    }
+
+    public Timer getGameLoopTimer () {
+        return gameLoop;
+    }
+
+    public void activateDoublePoints() {
+
+    }
+
+    public void addPoints(int n) {
+        score += n;
+    }
+
+    public void scheduleNextPowerUp () {
+        long randomSec = 15 + (long) random.nextInt(6);
+        nextPowerUpSpawnTime = System.currentTimeMillis() + (randomSec * 1000);
+    }
+
+    public boolean isCollected(Snake snake) {
+        return snake.getHead().getX() == currentPowerUp.getX() && snake.getHead().getY() == currentPowerUp.getY();
+    }
+
+    //PowerUps
+
+    private PowerUps spawnpowerUps () {
+
+        blockedTiles.clear();
+        blockedTiles.addAll(snake.getBody());
+        blockedTiles.addAll(obstacle.getObstacles());
+        blockedTiles.add(food.getFoodPosition());
+
+        
+        boolean isValid;
+        int attempts = 0;
+        int x, y;
+
+        do {
+
+            isValid = true;
+
+            x = random.nextInt(boardWidth / tileSize);
+            y = random.nextInt(boardHeight / tileSize);
+
+            for (Tile tile : blockedTiles) {
+                if (tile.getX() == x && tile.getY() == y ) {
+                        isValid = false;
+                        break;
+                }
+            }
+
+            attempts++;
+
+        } while (!isValid && attempts < 50);
+
+        int type = random.nextInt(3);
+
+        switch (type) {
+            case 0 : return new PowerUps_BigPoints(x, y, tileSize, boardWidth, boardHeight);
+            case 1 : return new PowerUps_DoublePoints(x, y, tileSize, boardWidth, boardHeight);
+            case 2 : return new PowerUps_SpeedBoost(x, y, tileSize, boardWidth, boardHeight);
+            default : return null;
+        }
+
+    }
 
     public void render(Graphics g) {
 
     snake.draw(g, tileSize);
     food.draw(g, tileSize);
     obstacle.drawObstacles(g, tileSize);
-    powerUps.draw(g);
+    currentPowerUp.draw(g);
 
     g.setColor(Color.BLUE);
     
@@ -225,9 +313,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
-    //features 
-
-    
     // visual painting
     public void paintComponent(Graphics g) {
 
