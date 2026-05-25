@@ -14,6 +14,7 @@ import objects.Snake;
 import objects.Tile;
 import objects.GameState;
 import objects.Obstacle;
+import objects.PowerUps;
 
 import Controls.InputManager;
 
@@ -43,8 +44,13 @@ public class GamePanel extends JPanel implements ActionListener {
     Food food;
     Tile tile;
     Obstacle obstacle;
+    PowerUps powerUps;
 
     InputManager input;
+
+    private boolean boostActive = false;
+    private long powerUpEndTime = 0;
+    private long nextPowerUpSpawnTime = 0;
 
     // Game logic
     Timer gameLoop;
@@ -65,8 +71,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
         snake = new Snake(12, 5);
         food = new Food(snake, boardWidth, boardHeight, tileSize);
+        powerUps = new PowerUps(tileSize, boardWidth, boardHeight);
         obstacle = new Obstacle(tileSize, boardWidth, boardHeight);
         obstacle.generateObstacles();
+        nextPowerUpSpawnTime = powerUps.scheduleNextPowerUp();
 
         input = new InputManager(snake, this);
         input.setUpInput(this);
@@ -103,10 +111,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
         score = 0;
         level = 1;
+        nextPowerUpSpawnTime = powerUps.scheduleNextPowerUp();
 
         snake.reset();
         food.reset();
         obstacle.reset();
+        powerUps.reset();
 
         gameLoop.start();
         gameLoop.setDelay(startDelay);
@@ -162,8 +172,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
         if (parent.getGameState() != GameState.PLAYING) return;
 
-        snake.move();
-
         if (snake.eats(food)) {
             score++;
             food.randomizeFood();
@@ -172,13 +180,31 @@ public class GamePanel extends JPanel implements ActionListener {
             if (score % 5 == 0 && delay > minDelay) {
                 level++;
                 delay -= 4;
-                gameLoop.setDelay(delay);
+                if (!boostActive) gameLoop.setDelay(delay);
             }
 
         }
 
         if (score > highscore) updateHighscore();
+
+        if (System.currentTimeMillis() > nextPowerUpSpawnTime) {
+            powerUps.randomizePowerUp(snake, obstacle);
+            nextPowerUpSpawnTime = powerUps.scheduleNextPowerUp();
+        }
         
+        if (powerUps.isCollected(snake)) {
+            powerUps.reset();
+            boostActive = true;
+            powerUpEndTime = System.currentTimeMillis() + 5000;
+            gameLoop.setDelay(80);
+        }
+
+        if (boostActive && System.currentTimeMillis() > powerUpEndTime) {
+            boostActive = false;
+            gameLoop.setDelay(delay);
+        }
+
+        snake.move();
 
     }   
 
@@ -187,6 +213,7 @@ public class GamePanel extends JPanel implements ActionListener {
     snake.draw(g, tileSize);
     food.draw(g, tileSize);
     obstacle.drawObstacles(g, tileSize);
+    powerUps.draw(g);
 
     g.setColor(Color.BLUE);
     
