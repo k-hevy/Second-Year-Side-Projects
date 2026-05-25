@@ -7,24 +7,19 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Obstacle {
-    
-
-    int x, y, tileSize;
-
+    int tileSize, boardWidth, boardHeight;
     ArrayList<Tile> obstacles;
     Random random;
-    Snake snake;
 
-    public Obstacle(Snake snake, int tileSize) {
-        
-        this.snake = snake;
+    public Obstacle(int tileSize, int boardWidth, int boardHeight) {
+        this.boardHeight = boardHeight;
+        this.boardWidth = boardWidth;
         this.tileSize = tileSize;
         obstacles = new ArrayList<Tile>();
         random =  new Random();
     }
 
     public void drawObstacles(Graphics g, int tileSize) {
-        System.out.println("lol");
 
         g.setColor(Color.PINK);
 
@@ -35,19 +30,18 @@ public class Obstacle {
 
     public void generateObstacles() {
         for (int i =0; i < 5; i++) {
-            int x = random.nextInt(tileSize);
-            int y = random.nextInt(tileSize);
+
+            int x = random.nextInt(boardWidth / tileSize);
+            int y = random.nextInt(boardHeight / tileSize);
 
             obstacles.add(new Tile(x, y));
         }
     }
 
-    public boolean checkSnakeObtstacleCollision(Snake snake) {
+    public boolean checkSnakeObstacleCollision(Snake snake) {
 
         for (Tile part : obstacles) {
-            if (snake.getHead().getX() == part.getX() && snake.getHead().getY() == part.getY()) {
-                return true;
-            }
+            if (snake.getHead().getX() == part.getX() && snake.getHead().getY() == part.getY()) return true;
         }
 
         return false;
@@ -56,6 +50,19 @@ public class Obstacle {
     public void reset() {
         obstacles.clear();
         generateObstacles();
+    }
+
+    public ArrayList<Tile> getObstacles () {
+        return obstacles;
+    }
+
+    public boolean foodSpawnsOnObstacle(Tile position) {
+
+        for (Tile walls : obstacles) {
+                if (walls.getX() == position.getX() &&  walls.getY() == position.getY()) return true;
+            }
+        return false;
+
     }
     
 }

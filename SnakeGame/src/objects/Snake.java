@@ -64,6 +64,31 @@ public class Snake {
         return head.getX() == food.position.getX() && head.getY() == food.position.getY();
     }
 
+    public boolean collidedWithSelf(Snake snake) {
+
+        for (Tile snakePart : snake.getBody()) {
+            if (snake.getHead().getX() == snakePart.getX() &&
+                snake.getHead().getY() == snakePart.getY()
+            ) return true;
+
+        }
+
+        return false;
+
+    }
+
+    public boolean collidedWithWall(Snake snake, int boardHeight, int boardWidth, int tileSize) {
+
+        if (snake.getHead().getX() >= boardWidth/tileSize || 
+            snake.getHead().getX() * tileSize < 0 || 
+            snake.getHead().getY() >= boardHeight/tileSize || 
+            snake.getHead().getY() * tileSize < 0) return true;
+
+        return false;
+        
+    }
+
+
     public int getLength() {
         return body.size();
     }

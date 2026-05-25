@@ -65,7 +65,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
         snake = new Snake(12, 5);
         food = new Food(snake, boardWidth, boardHeight, tileSize);
-        obstacle = new Obstacle(snake, tileSize);
+        obstacle = new Obstacle(tileSize, boardWidth, boardHeight);
         obstacle.generateObstacles();
 
         input = new InputManager(snake, this);
@@ -92,17 +92,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public boolean gameOver() {
 
-        for (int i = 0; i < snake.getLength(); i++) {
-
-            Tile snakePart = snake.getBody().get(i);
-
-            if (snake.getHead().getX() == snakePart.getX() && snake.getHead().getY() == snakePart.getY()) return true;
-            
-
-        } // move this to snake, make methods acccept snake
-
-        if (snake.getHead().getX() >= boardWidth/tileSize || snake.getHead().getX() * tileSize < 0 || snake.getHead().getY() >= boardHeight/tileSize || snake.getHead().getY() * tileSize < 0) return true;
-        if (obstacle.checkSnakeObtstacleCollision(snake)) return true; 
+        if (snake.collidedWithSelf(snake)) return true;
+        if (snake.collidedWithWall(snake, boardWidth, boardHeight, tileSize)) return true;
+        if (obstacle.checkSnakeObstacleCollision(snake)) return true; 
 
         return false;
     } // also move this to snake

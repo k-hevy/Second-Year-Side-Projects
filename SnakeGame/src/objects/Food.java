@@ -2,12 +2,12 @@ package objects;
 import java.util.Random;
 import java.awt.*;
 
-
 public class Food {
 
     Tile position;
     Random random;
     Snake snake;
+    Obstacle obstacle;
 
     int boardwidth;
     int boardHeight;
@@ -29,10 +29,13 @@ public class Food {
     public void randomizeFood() {
 
         boolean onSnake;
+        boolean onObstacle;
 
         do {
 
             onSnake = false;
+            onObstacle = false;
+
             position.setX(random.nextInt(boardwidth / tileSize));
             position.setY(random.nextInt(boardHeight / tileSize));
 
@@ -45,7 +48,12 @@ public class Food {
 
             }
 
-        } while (onSnake);
+            if (obstacle.foodSpawnsOnObstacle(position)) {
+                onObstacle = true;
+                break;
+            }
+
+        } while (onSnake || onObstacle);
         
     } 
 
@@ -57,6 +65,10 @@ public class Food {
 
     public void reset() {
         randomizeFood();
+    }
+
+    public Tile getFoodPosition() {
+        return position;
     }
 
 }
