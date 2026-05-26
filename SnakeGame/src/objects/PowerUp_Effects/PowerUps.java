@@ -2,6 +2,7 @@ package objects.PowerUp_Effects;
 
 import java.util.Random;
 
+import managers.PowerUpManager;
 import objects.Tile;
 import user_interface.GamePanel;
 
@@ -15,7 +16,10 @@ public abstract class PowerUps {
     protected Random random;
     protected int x, y;
 
-    public PowerUps (int x, int y, int tileSize, int boardWidth, int boardHeight) {
+    protected PowerUpManager powerUpManager;
+
+    public PowerUps (PowerUpManager powerUpManager, int x, int y, int tileSize, int boardWidth, int boardHeight) {
+        this.powerUpManager = powerUpManager;
         this.x = x;
         this.y = y;
         this.boardWidth = boardWidth;
@@ -27,6 +31,9 @@ public abstract class PowerUps {
 
     public abstract void draw(Graphics g);
 
+    public Tile getPowerUp() {
+        return powerUp;
+    }
 
     public int getX () {
         return x;
@@ -34,6 +41,11 @@ public abstract class PowerUps {
 
     public int getY () {
         return y;
+    }
+
+    public void resetPosition() {
+        x = -1;
+        y = -1;
     }
 
     public abstract void applyPowerUp(GamePanel gamePanel);

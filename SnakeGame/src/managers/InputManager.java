@@ -1,4 +1,4 @@
-package Controls;
+package managers;
 
 import java.awt.event.ActionEvent;
 import javax.swing.*;
