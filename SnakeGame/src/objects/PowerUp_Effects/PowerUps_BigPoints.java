@@ -1,5 +1,8 @@
 package objects.PowerUp_Effects;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 import user_interface.GamePanel;
 
 public class PowerUps_BigPoints extends PowerUps  {
@@ -13,6 +16,12 @@ public class PowerUps_BigPoints extends PowerUps  {
         gamePanel.setBoostActive(true);
         gamePanel.setPopowerUpEndTime(System.currentTimeMillis() + 300);
         gamePanel.addPoints(5);
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.RED);
+        g.fillOval(powerUp.getX() * tileSize, powerUp.getY() * tileSize, tileSize, tileSize);
     }
 
 }

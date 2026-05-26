@@ -81,7 +81,6 @@ public class GamePanel extends JPanel implements ActionListener {
         snake = new Snake(12, 5);
         food = new Food(snake, boardWidth, boardHeight, tileSize);
         random = new Random();
-        //powerUps = new PowerUps(tileSize, boardWidth, boardHeight);
         obstacle = new Obstacle(tileSize, boardWidth, boardHeight);
         obstacle.generateObstacles();
 
@@ -127,7 +126,7 @@ public class GamePanel extends JPanel implements ActionListener {
         snake.reset();
         food.reset();
         obstacle.reset();
-        currentPowerUp.resetPosition();
+        currentPowerUp = spawnPowerUps();
 
         gameLoop.start();
         gameLoop.setDelay(startDelay);
@@ -188,41 +187,45 @@ public class GamePanel extends JPanel implements ActionListener {
             food.randomizeFood();
             snake.grow();
 
+            level = score / 5;
+
             if (score % 5 == 0 && delay > minDelay) {
-                level++;
                 delay -= 4;
                 if (!boostActive) gameLoop.setDelay(delay);
             }
-
         }
 
         if (score > highscore) updateHighscore();
-
-        if (System.currentTimeMillis() >=  nextPowerUpSpawnTime &&  currentPowerUp == null ) {
-            scheduleNextPowerUp(); // schdules when next powerUp spawns
-            currentPowerUp = spawnpowerUps(); // chooses poweUp type and position
-        }
-
-        if (isCollected(snake) && currentPowerUp != null) {
-
-            boostActive = true;
-
-            currentPowerUp.resetPosition();
-            currentPowerUp = null;
-
-            currentPowerUp.applyPowerUp(this);
         
+        checkPowerUpState();
+
+        snake.move();
+
+    }   
+
+    private void checkPowerUpState () {
+        if ((nextPowerUpSpawnTime - System.currentTimeMillis() < 0) && currentPowerUp != null) {
+            scheduleNextPowerUp(); // schdules when next powerUp spawns
+            currentPowerUp = spawnPowerUps(); // chooses poweUp type and position
         }
 
-        if (boostActive && System.currentTimeMillis() > powerUpEndTime) {
+        if ((System.currentTimeMillis() >=  nextPowerUpSpawnTime) &&  currentPowerUp == null ) {
+            scheduleNextPowerUp(); // schdules when next powerUp spawns
+            currentPowerUp = spawnPowerUps(); // chooses poweUp type and position
+        } 
+
+        if ( currentPowerUp != null && powerUpCollected()) {
+            boostActive = true;
+            currentPowerUp.applyPowerUp(this);
+            currentPowerUp = null;
+        }
+
+        if (boostActive && (System.currentTimeMillis() > powerUpEndTime)) {
             boostActive = false;
             multiplier = 1;
             gameLoop.setDelay(delay);
         } // speedBoost
-        
-        snake.move();
-
-    }   
+    }
 
     public void setBoostActive (boolean value) {
         boostActive = value;
@@ -237,7 +240,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void activateDoublePoints() {
-
+        multiplier = 2;
     }
 
     public void addPoints(int n) {
@@ -245,24 +248,23 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void scheduleNextPowerUp () {
-        long randomSec = 15 + (long) random.nextInt(6);
+        long randomSec =  15 + (long) random.nextInt(6);
         nextPowerUpSpawnTime = System.currentTimeMillis() + (randomSec * 1000);
     }
 
-    public boolean isCollected(Snake snake) {
+    public boolean powerUpCollected() {
         return snake.getHead().getX() == currentPowerUp.getX() && snake.getHead().getY() == currentPowerUp.getY();
     }
 
     //PowerUps
 
-    private PowerUps spawnpowerUps () {
+    private PowerUps spawnPowerUps () {
 
         blockedTiles.clear();
         blockedTiles.addAll(snake.getBody());
         blockedTiles.addAll(obstacle.getObstacles());
-        blockedTiles.add(food.getFoodPosition());
+        blockedTiles.add(food.getFoodTile());
 
-        
         boolean isValid;
         int attempts = 0;
         int x, y;
@@ -301,7 +303,7 @@ public class GamePanel extends JPanel implements ActionListener {
     snake.draw(g, tileSize);
     food.draw(g, tileSize);
     obstacle.drawObstacles(g, tileSize);
-    currentPowerUp.draw(g);
+    if (currentPowerUp != null) currentPowerUp.draw(g);
 
     g.setColor(Color.BLUE);
     
@@ -333,6 +335,8 @@ public class GamePanel extends JPanel implements ActionListener {
         g.drawString("Highscore: " + highscore, tileSize - 16 , tileSize + 25);
         g.drawString("Level: " + level, tileSize - 16 , tileSize + 50);
         g.drawString("Speed: " + delay, tileSize - 16 , tileSize + 75);
+        g.drawString("Next powerUp: " + (nextPowerUpSpawnTime - System.currentTimeMillis()) / 1000 + "s", tileSize - 16 , tileSize + 100);
+        // g.drawString("PowerUp type " + cou, tileSize - 16 , tileSize + 125);
         
     }
 

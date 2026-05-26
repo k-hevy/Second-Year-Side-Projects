@@ -1,5 +1,8 @@
 package objects.PowerUp_Effects;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 import user_interface.GamePanel;
 
 public class PowerUps_SpeedBoost extends PowerUps {
@@ -13,6 +16,12 @@ public class PowerUps_SpeedBoost extends PowerUps {
         gamePanel.setBoostActive(true);
         gamePanel.setPopowerUpEndTime(System.currentTimeMillis() + 8000);
         gamePanel.getGameLoopTimer().setDelay(80);
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.YELLOW);
+        g.fillOval(powerUp.getX() * tileSize, powerUp.getY() * tileSize, tileSize, tileSize);
     }
     
 

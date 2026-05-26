@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class Food {
 
-    Tile position;
+    Tile foodTile;
     Random random;
     Snake snake;
     Obstacle obstacle;
@@ -18,9 +18,10 @@ public class Food {
         this.boardwidth = boardWidth;
         this.boardHeight = boardHeight;
         this.tileSize = tileSize;
+        obstacle = new Obstacle(tileSize, boardWidth, boardHeight);
 
         random = new Random();
-        position = new Tile(0, 0);
+        foodTile = new Tile(0, 0);
 
         randomizeFood();
 
@@ -36,19 +37,19 @@ public class Food {
             onSnake = false;
             onObstacle = false;
 
-            position.setX(random.nextInt(boardwidth / tileSize));
-            position.setY(random.nextInt(boardHeight / tileSize));
+            foodTile.setX(random.nextInt(boardwidth / tileSize));
+            foodTile.setY(random.nextInt(boardHeight / tileSize));
 
             for (Tile part : snake.getBody()) {
 
-                if (part.getX() == position.getX() && part.getY() == position.getY()) {
+                if (part.getX() == foodTile.getX() && part.getY() == foodTile.getY()) {
                     onSnake = true;
                     break;
                 }
 
             }
 
-            if (obstacle.foodSpawnsOnObstacle(position)) {
+            if (obstacle.foodSpawnsOnObstacle(foodTile)) {
                 onObstacle = true;
                 break;
             }
@@ -60,15 +61,15 @@ public class Food {
     public void draw(Graphics g, int tileSize) {
         //food
         g.setColor(Color.MAGENTA);
-        g.fill3DRect(position.getX() * tileSize, position.getY() * tileSize, tileSize, tileSize, true);
+        g.fill3DRect(foodTile.getX() * tileSize, foodTile.getY() * tileSize, tileSize, tileSize, true);
     }
 
     public void reset() {
         randomizeFood();
     }
 
-    public Tile getFoodPosition() {
-        return position;
+    public Tile getFoodTile() {
+        return foodTile;
     }
 
 }

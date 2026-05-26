@@ -1,5 +1,8 @@
 package objects.PowerUp_Effects;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 import user_interface.GamePanel;
 
 public class PowerUps_DoublePoints extends PowerUps {
@@ -13,6 +16,12 @@ public class PowerUps_DoublePoints extends PowerUps {
         gamePanel.setBoostActive(true);
         gamePanel.setPopowerUpEndTime(System.currentTimeMillis() + 10000);
         gamePanel.activateDoublePoints();
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.WHITE);
+        g.fillOval(powerUp.getX() * tileSize, powerUp.getY() * tileSize, tileSize, tileSize);
     }
 
 }

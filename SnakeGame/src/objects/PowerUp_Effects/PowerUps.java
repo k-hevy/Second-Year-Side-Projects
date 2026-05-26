@@ -5,7 +5,6 @@ import java.util.Random;
 import objects.Tile;
 import user_interface.GamePanel;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 public abstract class PowerUps {
@@ -26,16 +25,8 @@ public abstract class PowerUps {
         powerUp = new Tile(x, y);
     }
 
-    public void draw(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillOval(powerUp.getX() * tileSize, powerUp.getY() * tileSize, tileSize, tileSize);
-    }
+    public abstract void draw(Graphics g);
 
-    
-
-    public void resetPosition() { 
-        powerUp = new Tile(-1, -1);
-    }
 
     public int getX () {
         return x;

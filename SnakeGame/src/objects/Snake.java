@@ -61,7 +61,7 @@ public class Snake {
     }
 
     public boolean eats (Food food) {
-        return head.getX() == food.position.getX() && head.getY() == food.position.getY();
+        return head.getX() == food.foodTile.getX() && head.getY() == food.foodTile.getY();
     }
 
     public boolean collidedWithSelf(Snake snake) {
