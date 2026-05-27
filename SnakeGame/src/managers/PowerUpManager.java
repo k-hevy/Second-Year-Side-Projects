@@ -86,7 +86,7 @@ public class PowerUpManager {
     }
 
     private void scheduleNextPowerUp() {
-        long randomSec =  2 + (long) random.nextInt(6);
+        long randomSec =  10 + (long) random.nextInt(6);
         nextSpawnTime = System.currentTimeMillis() + (randomSec * 1000);
 
     }

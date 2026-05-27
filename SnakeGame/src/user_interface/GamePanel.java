@@ -16,6 +16,7 @@ import objects.GameState;
 import objects.Obstacle;
 
 import managers.CollisionManager;
+import managers.GameStateManager;
 import managers.InputManager;
 import managers.PowerUpManager;
 import managers.ScoreManager;
@@ -48,6 +49,7 @@ public class GamePanel extends JPanel implements ActionListener {
     ArrayList<Tile> blockedTiles;
 
     // Managers
+    GameStateManager gameStateManager;
     InputManager input;
     PowerUpManager powerUpManager;
     CollisionManager collisionManager;
@@ -85,6 +87,7 @@ public class GamePanel extends JPanel implements ActionListener {
         blockedTiles = new ArrayList<Tile>();
 
         // Managers
+        gameStateManager = new GameStateManager();
         input = new InputManager(snake, this);
         input.setUpInput(this);
         scoreManager = new ScoreManager();
@@ -133,17 +136,17 @@ public class GamePanel extends JPanel implements ActionListener {
 //background initializing
 
     public void togglePause () {
-        if (parent.getGameState() == GameState.PLAYING) {
-            parent.setGameState(GameState.PAUSED);
-        } else if (parent.getGameState()== GameState.PAUSED) {
-            parent.setGameState(GameState.PLAYING);
+        if (gameStateManager.getGameState() == GameState.PLAYING) {
+            gameStateManager.setGameState(GameState.PAUSED);
+        } else if (gameStateManager.getGameState() == GameState.PAUSED) {
+            gameStateManager.setGameState(GameState.PLAYING);
         }
     }
     
     // Game Logic
     public void update() {
 
-        if (parent.getGameState() != GameState.PLAYING) return;
+        if (gameStateManager.getGameState() != GameState.PLAYING) return;
         
         snake.move();
 
@@ -196,7 +199,7 @@ public class GamePanel extends JPanel implements ActionListener {
     g.setFont(new Font("Arial", Font.PLAIN, 16));
     drawHudAndScores(g);
 
-    if (parent.getGameState() == GameState.PAUSED) drawPausedOverlay(g);
+    if (gameStateManager.getGameState() == GameState.PAUSED) drawPausedOverlay(g);
 
     }
 

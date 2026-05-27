@@ -1,6 +1,8 @@
 package user_interface;
 import java.awt.*;
 import javax.swing.*;
+
+import managers.GameStateManager;
 import objects.GameState;
 
 public class SnakeGame extends JFrame {
@@ -11,12 +13,15 @@ public class SnakeGame extends JFrame {
     GamePanel gamePanel;
     GameOverPanel gameOverPanel;
     MenuPanel menuPanel;
-    private GameState gameState;
+    
+    GameState gameState;
+    GameStateManager gameStateManager;
 
 
     public SnakeGame(int boardWidth, int boardHeight) {
 
         gameState = GameState.MENU;
+        gameStateManager = new GameStateManager();
 
         layout = new CardLayout();
         mainPanel = new JPanel();
@@ -47,28 +52,20 @@ public class SnakeGame extends JFrame {
     }
 
     public void startGame() {
-        gameState = GameState.PLAYING;
+        gameStateManager.setGameState(GameState.PLAYING);
         gamePanel.resetGame();
         layout.show(mainPanel, "GAME");
         gamePanel.requestFocusInWindow();
     }
 
     public void showMenu () {
-        gameState = GameState.MENU;
+        gameStateManager.setGameState(GameState.MENU);
         layout.show(mainPanel, "MENU");
     }
 
     public void showGameOver () {
-        gameState = GameState.GAME_OVER;
+        gameStateManager.setGameState(GameState.GAME_OVER);
         layout.show(mainPanel, "GAME_OVER");
-    }
-
-    public GameState getGameState() {
-        return gameState;
-    }
-
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
     }
 
 }
