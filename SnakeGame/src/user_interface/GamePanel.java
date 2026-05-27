@@ -20,6 +20,7 @@ import managers.GameStateManager;
 import managers.InputManager;
 import managers.PowerUpManager;
 import managers.ScoreManager;
+import managers.SoundManager;
 
 
 
@@ -54,6 +55,7 @@ public class GamePanel extends JPanel implements ActionListener {
     PowerUpManager powerUpManager;
     CollisionManager collisionManager;
     ScoreManager scoreManager;
+    SoundManager soundManager;
 
     // Game logic
     Timer gameLoop;
@@ -63,7 +65,7 @@ public class GamePanel extends JPanel implements ActionListener {
     BufferedReader br;
 
     // Constructor
-    GamePanel (SnakeGame parent, int boardWidth, int boardHeight) {
+    GamePanel (SnakeGame parent, int boardWidth, int boardHeight, GameStateManager gameStateManager) {
 
         // boardSize
         this.boardWidth = boardWidth;
@@ -87,14 +89,14 @@ public class GamePanel extends JPanel implements ActionListener {
         blockedTiles = new ArrayList<Tile>();
 
         // Managers
-        gameStateManager = new GameStateManager();
+        this.gameStateManager = gameStateManager;
+        soundManager = new SoundManager();
         input = new InputManager(snake, this);
         input.setUpInput(this);
         scoreManager = new ScoreManager();
         powerUpManager = new PowerUpManager(this, boardWidth, boardHeight, tileSize, scoreManager);
-        collisionManager = new CollisionManager(this, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
+        collisionManager = new CollisionManager(soundManager, this, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
         
-
         // game Timer
         gameLoop = new Timer(startDelay, this);
         gameLoop.start();

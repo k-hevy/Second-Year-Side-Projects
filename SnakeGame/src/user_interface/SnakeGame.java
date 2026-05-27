@@ -20,15 +20,15 @@ public class SnakeGame extends JFrame {
 
     public SnakeGame(int boardWidth, int boardHeight) {
 
-        gameState = GameState.MENU;
         gameStateManager = new GameStateManager();
+        gameStateManager.setGameState(GameState.MENU);
 
         layout = new CardLayout();
         mainPanel = new JPanel();
 
         mainPanel.setLayout(layout);
 
-        gamePanel = new GamePanel(this, boardWidth, boardHeight);
+        gamePanel = new GamePanel(this, boardWidth, boardHeight, gameStateManager);
         menuPanel = new MenuPanel(this);
         gameOverPanel = new GameOverPanel(this);
 

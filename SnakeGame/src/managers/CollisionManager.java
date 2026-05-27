@@ -10,17 +10,19 @@ public class CollisionManager {
 
     private GamePanel gamePanel;
     private PowerUpManager powerUpManager;
+    private SoundManager soundManager;
     private Obstacle obstacle;
     private Snake snake;
     private Food food;
     private int boardWidth;
     private int boardHeight;
     private int tileSize;
-
-    public CollisionManager(GamePanel gamePanel, PowerUpManager powerUpManager,
+    
+    public CollisionManager(SoundManager soundManager, GamePanel gamePanel, PowerUpManager powerUpManager,
         Obstacle obstacle, Snake snake, Food food, int boardWidth, int boardHeight,
         int tileSize) {
         this.gamePanel = gamePanel;
+        this.soundManager = soundManager;
         this.powerUpManager = powerUpManager;
         this.obstacle = obstacle;
         this.snake = snake;
@@ -42,6 +44,7 @@ public class CollisionManager {
         if (snake.getHead().getX() == food.getFoodTile().getX() &&
             snake.getHead().getY() == food.getFoodTile().getY()) {
                 gamePanel.handleFoodEaten();
+                SoundManager.playSound(SoundManager.SoundEffect.EAT_FOOD);
         }
     }
 
@@ -50,7 +53,10 @@ public class CollisionManager {
         for (Tile snakePart : snake.getBody()) {
             if (snake.getHead().getX() == snakePart.getX() &&
                 snake.getHead().getY() == snakePart.getY()
-            ) gamePanel.gameOver();
+            ) {
+                gamePanel.gameOver(); 
+                SoundManager.playSound(SoundManager.SoundEffect.COLLISION);
+            }
         }
     }
 
@@ -59,6 +65,7 @@ public class CollisionManager {
             snake.getHead().getX() == powerUpManager.getPowerUps().getX() &&
             snake.getHead().getY() == powerUpManager.getPowerUps().getY()) {
                 powerUpManager.applyPowerUp();
+                SoundManager.playSound(SoundManager.SoundEffect.POWERUP);
         }
     }
 
@@ -68,14 +75,20 @@ public class CollisionManager {
             snake.getHead().getX() * tileSize < 0 || 
             snake.getHead().getY() >= boardHeight/tileSize || 
             snake.getHead().getY() * tileSize < 0
-        ) gamePanel.gameOver(); 
+        ) {
+            gamePanel.gameOver(); 
+            SoundManager.playSound(SoundManager.SoundEffect.GAME_OVER);
+        }
         
     }
 
     public void checkObstacleCollision() {
         for (Tile part : obstacle.getObstacles()) {
             if (snake.getHead().getX() == part.getX() && snake.getHead().getY() == part.getY()
-            ) gamePanel.gameOver();
+            ) {
+            gamePanel.gameOver(); 
+            SoundManager.playSound(SoundManager.SoundEffect.GAME_OVER);
+        }
         }
     }
 
