@@ -38,15 +38,6 @@ public class Obstacle {
         }
     }
 
-    public boolean checkSnakeObstacleCollision(Snake snake) {
-
-        for (Tile part : obstacles) {
-            if (snake.getHead().getX() == part.getX() && snake.getHead().getY() == part.getY()) return true;
-        }
-
-        return false;
-    }
-
     public void reset() {
         obstacles.clear();
         generateObstacles();

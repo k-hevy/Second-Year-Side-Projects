@@ -4,12 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import managers.PowerUpManager;
+import managers.ScoreManager;
 import user_interface.GamePanel;
 
 public class PowerUps_SpeedBoost extends PowerUps {
 
-    public PowerUps_SpeedBoost (PowerUpManager powerUpManager, int x, int y, int tileSize, int boardWidth, int boardHeight) {
-        super(powerUpManager, x, y, tileSize, boardWidth, boardHeight);
+    public PowerUps_SpeedBoost (PowerUpManager powerUpManager, int x, int y, int tileSize, int boardWidth, int boardHeight, ScoreManager scoreManager) {
+        super(powerUpManager, x, y, tileSize, boardWidth, boardHeight, scoreManager);
     }
 
     @Override

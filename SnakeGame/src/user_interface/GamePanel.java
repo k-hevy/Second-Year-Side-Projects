@@ -5,9 +5,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -17,8 +14,11 @@ import objects.Tile;
 import objects.PowerUp_Effects.PowerUps;
 import objects.GameState;
 import objects.Obstacle;
+
+import managers.CollisionManager;
 import managers.InputManager;
 import managers.PowerUpManager;
+import managers.ScoreManager;
 
 
 
@@ -39,12 +39,6 @@ public class GamePanel extends JPanel implements ActionListener {
     int delay = 140;
     final int minDelay = 90;
 
-    // Scores
-    int level = 1;
-    int score;
-    private int highscore;
-    private int multiplier = 1;
-
     // Objects
     public Snake snake;
     Food food;
@@ -56,6 +50,8 @@ public class GamePanel extends JPanel implements ActionListener {
     // Managers
     InputManager input;
     PowerUpManager powerUpManager;
+    CollisionManager collisionManager;
+    ScoreManager scoreManager;
 
     // Game logic
     Timer gameLoop;
@@ -84,15 +80,16 @@ public class GamePanel extends JPanel implements ActionListener {
         random = new Random();
         obstacle = new Obstacle(tileSize, boardWidth, boardHeight);
 
+        // Background prep
+        obstacle.generateObstacles();
+        blockedTiles = new ArrayList<Tile>();
+
         // Managers
         input = new InputManager(snake, this);
         input.setUpInput(this);
-        powerUpManager = new PowerUpManager(this, boardWidth, boardHeight, tileSize);
-
-        // Background prep
-        loadHighscore();
-        obstacle.generateObstacles();
-        blockedTiles = new ArrayList<Tile>();
+        scoreManager = new ScoreManager();
+        powerUpManager = new PowerUpManager(this, boardWidth, boardHeight, tileSize, scoreManager);
+        collisionManager = new CollisionManager(this, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
         
 
         // game Timer
@@ -110,24 +107,20 @@ public class GamePanel extends JPanel implements ActionListener {
         
     }
 
-    public boolean gameOver() {
+    public void gameOver() {
 
-        if (snake.collidedWithSelf(snake)) return true;
-        if (snake.collidedWithWall(snake, boardWidth, boardHeight, tileSize)) return true;
-        if (obstacle.checkSnakeObstacleCollision(snake)) return true; 
+        gameLoop.stop();
+        parent.showGameOver();
 
-        return false;
-    } // also move this to snake
+    } 
 
     public void resetGame() {
-
-        score = 0;
-        level = 1;
 
         snake.reset();
         food.reset();
         obstacle.reset();
         powerUpManager.reset();
+        scoreManager.reset();
 
         gameLoop.start();
         gameLoop.setDelay(startDelay);
@@ -138,32 +131,6 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
 //background initializing
-
-    public void updateHighscore () {
-        try (FileWriter fw = new FileWriter("highscore.txt")) {
-            fw.write(String.valueOf(score));
-            highscore = score;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-    }
-
-    public void loadHighscore () {
-
-        File file = new File("highscore.txt");
-
-        if (!file.exists()) {
-                highscore = 0;
-                return;
-            }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            highscore = Integer.parseInt(br.readLine());
-        } catch (Exception e) {
-            highscore = 0;
-        }
-    }
 
     public void togglePause () {
         if (parent.getGameState() == GameState.PLAYING) {
@@ -176,50 +143,35 @@ public class GamePanel extends JPanel implements ActionListener {
     // Game Logic
     public void update() {
 
-        if (gameOver()) {
-                gameLoop.stop();
-                parent.showGameOver();
-            }
-
         if (parent.getGameState() != GameState.PLAYING) return;
-
-        if (snake.eats(food)) {
-            score = score + (1 * multiplier);
-            food.randomizeFood();
-            snake.grow();
-
-            level = score / 5;
-
-            if (score % 5 == 0 && delay > minDelay) {
-                delay -= 4;
-                if (!powerUpManager.isEffectActive()) gameLoop.setDelay(delay);
-            }
-        }
-
-        if (score > highscore) updateHighscore();
-
-        powerUpManager.update();
-        powerUpManager.endEffect();
-
+        
         snake.move();
+
+        scoreManager.update();
+        collisionManager.update();
+        powerUpManager.update();
 
     }   
 
+    public void handleFoodEaten() {
+        scoreManager.setScore(scoreManager.getScore() + (1 * scoreManager.getMultiplier()));
+        food.randomizeFood();
+        snake.grow();
+
+        if (scoreManager.getScore() % 5 == 0 && delay > minDelay) {
+            delay -= 4;
+            if (!powerUpManager.isEffectActive()) gameLoop.setDelay(delay);
+        }
+
+    }
+
     public void resetPowerUpEffects () {
-        multiplier = 1;
+        scoreManager.setMultiplier(1);
         gameLoop.setDelay(delay);
     }
 
     public Timer getGameLoopTimer () {
         return gameLoop;
-    }
-
-    public void activateDoublePoints() {
-        multiplier = 2;
-    }
-
-    public void addPoints(int n) {
-        score += n;
     }
 
     public ArrayList<Tile> getBlockedTiles() {
@@ -264,9 +216,9 @@ public class GamePanel extends JPanel implements ActionListener {
             }
 
         g.setColor(Color.WHITE);
-        g.drawString("Score: " + score, tileSize - 16, tileSize);
-        g.drawString("Highscore: " + highscore, tileSize - 16 , tileSize + 25);
-        g.drawString("Level: " + level, tileSize - 16 , tileSize + 50);
+        g.drawString("Score: " + scoreManager.getScore(), tileSize - 16, tileSize);
+        g.drawString("Highscore: " + scoreManager.getHighscore(), tileSize - 16 , tileSize + 25);
+        g.drawString("Level: " + scoreManager.getLevel(), tileSize - 16 , tileSize + 50);
         g.drawString("Speed: " + delay, tileSize - 16 , tileSize + 75);
         g.drawString("Next powerUp: " + (powerUpManager.getNextPowerUpTime() - System.currentTimeMillis()) / 1000 + "s", tileSize - 16 , tileSize + 100);
         // g.drawString("PowerUp type " + cou, tileSize - 16 , tileSize + 125);

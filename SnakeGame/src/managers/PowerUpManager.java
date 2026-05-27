@@ -14,6 +14,7 @@ public class PowerUpManager {
 
     private PowerUps currentPowerUp;
     private GamePanel gamePanel;
+    private ScoreManager scoreManager;
 
     private boolean boostIsActive;
 
@@ -26,11 +27,12 @@ public class PowerUpManager {
 
     private Random random;
 
-    public PowerUpManager (GamePanel gamePanel, int boardWidth, int boardHeight, int tileSize) {
+    public PowerUpManager (GamePanel gamePanel, int boardWidth, int boardHeight, int tileSize, ScoreManager scoreManager) {
         this.gamePanel = gamePanel;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         this.tileSize = tileSize;
+        this.scoreManager = scoreManager;
         random = new Random();
         scheduleNextPowerUp();
     }
@@ -45,7 +47,8 @@ public class PowerUpManager {
             // currentPowerUp.resetPosition();
         }
 
-        checkCollision();
+        endEffect();
+
     }
 
     private void spawnPowerUps (int boardWidth, int boardHeight, int tileSize, ArrayList<Tile> blockedTiles) {
@@ -75,9 +78,9 @@ public class PowerUpManager {
         int type = random.nextInt(3);
 
         switch (type) {
-            case 0 : currentPowerUp = new PowerUps_BigPoints(this, x, y, tileSize, boardWidth, boardHeight); break;
-            case 1 : currentPowerUp = new PowerUps_DoublePoints(this, x, y, tileSize, boardWidth, boardHeight); break;
-            case 2 : currentPowerUp = new PowerUps_SpeedBoost(this, x, y, tileSize, boardWidth, boardHeight); break;
+            case 0 : currentPowerUp = new PowerUps_BigPoints(this, x, y, tileSize, boardWidth, boardHeight, scoreManager); break;
+            case 1 : currentPowerUp = new PowerUps_DoublePoints(this, x, y, tileSize, boardWidth, boardHeight, scoreManager); break;
+            case 2 : currentPowerUp = new PowerUps_SpeedBoost(this, x, y, tileSize, boardWidth, boardHeight, scoreManager); break;
         }
 
     }
@@ -86,14 +89,6 @@ public class PowerUpManager {
         long randomSec =  2 + (long) random.nextInt(6);
         nextSpawnTime = System.currentTimeMillis() + (randomSec * 1000);
 
-    }
-
-    private void checkCollision() {
-        if (currentPowerUp != null && 
-            gamePanel.snake.getHead().getX() == currentPowerUp.getX() &&
-            gamePanel.snake.getHead().getY() == currentPowerUp.getY()) {
-                applyPowerUp();
-        }
     }
 
     public void applyPowerUp() {
