@@ -4,12 +4,11 @@ import java.util.Random;
 
 import managers.PowerUpManager;
 import managers.ScoreManager;
+import objects.Entity;
 import objects.Tile;
 import user_interface.GamePanel;
 
-import java.awt.Graphics;
-
-public abstract class PowerUps {
+public abstract class PowerUps extends Entity {
 
     protected int tileSize;
     protected int boardWidth, boardHeight;
@@ -31,8 +30,6 @@ public abstract class PowerUps {
         random = new Random();
         powerUp = new Tile(x, y);
     }
-
-    public abstract void draw(Graphics g);
 
     public Tile getPowerUp() {
         return powerUp;

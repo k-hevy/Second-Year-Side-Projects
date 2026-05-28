@@ -11,7 +11,7 @@ import java.util.Random;
 import objects.Food;
 import objects.Snake;
 import objects.Tile;
-import objects.PowerUp_Effects.PowerUps;
+
 import objects.GameState;
 import objects.Obstacle;
 
@@ -21,8 +21,7 @@ import managers.InputManager;
 import managers.PowerUpManager;
 import managers.ScoreManager;
 import managers.SoundManager;
-
-
+import managers.EntityManager;
 
 public class GamePanel extends JPanel implements ActionListener {
 
@@ -46,7 +45,6 @@ public class GamePanel extends JPanel implements ActionListener {
     Food food;
     Tile tile;
     Obstacle obstacle;
-    PowerUps powerUps;
     ArrayList<Tile> blockedTiles;
 
     // Managers
@@ -56,6 +54,7 @@ public class GamePanel extends JPanel implements ActionListener {
     CollisionManager collisionManager;
     ScoreManager scoreManager;
     SoundManager soundManager;
+    EntityManager entityManager;
 
     // Game logic
     Timer gameLoop;
@@ -94,7 +93,8 @@ public class GamePanel extends JPanel implements ActionListener {
         input = new InputManager(snake, this);
         input.setUpInput(this);
         scoreManager = new ScoreManager();
-        powerUpManager = new PowerUpManager(this, boardWidth, boardHeight, tileSize, scoreManager);
+        entityManager = new EntityManager();
+        powerUpManager = new PowerUpManager(this, boardWidth, boardHeight, tileSize, scoreManager, entityManager);
         collisionManager = new CollisionManager(soundManager, this, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
         
         // game Timer
@@ -154,7 +154,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
         scoreManager.update();
         collisionManager.update();
-        powerUpManager.update();
+        powerUpManager.update(); // 
+        entityManager.update();
 
     }   
 
@@ -193,7 +194,7 @@ public class GamePanel extends JPanel implements ActionListener {
     snake.draw(g, tileSize);
     food.draw(g, tileSize);
     obstacle.drawObstacles(g, tileSize);
-    if (powerUpManager.getPowerUps() != null) powerUpManager.getPowerUps().draw(g);
+    entityManager.draw(g);
 
     g.setColor(Color.BLUE);
     

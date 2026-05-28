@@ -15,6 +15,7 @@ public class PowerUpManager {
     private PowerUps currentPowerUp;
     private GamePanel gamePanel;
     private ScoreManager scoreManager;
+    private EntityManager entityManager;
 
     private boolean boostIsActive;
 
@@ -24,15 +25,17 @@ public class PowerUpManager {
     private int boardHeight;
     private int boardWidth;
     private int tileSize;
+    
 
     private Random random;
 
-    public PowerUpManager (GamePanel gamePanel, int boardWidth, int boardHeight, int tileSize, ScoreManager scoreManager) {
+    public PowerUpManager (GamePanel gamePanel, int boardWidth, int boardHeight, int tileSize, ScoreManager scoreManager, EntityManager entityManager) {
         this.gamePanel = gamePanel;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         this.tileSize = tileSize;
         this.scoreManager = scoreManager;
+        this.entityManager = entityManager;
         random = new Random();
         scheduleNextPowerUp();
     }
@@ -41,10 +44,11 @@ public class PowerUpManager {
 
         long currentTime = System.currentTimeMillis();
 
-        if ((currentPowerUp == null && (currentTime >= nextSpawnTime)) || (currentPowerUp != null && (nextSpawnTime - currentTime <= 0)) ) {
+        if ((currentPowerUp ==  null  && (currentTime >= nextSpawnTime)) ||
+            (currentPowerUp != null && (nextSpawnTime - currentTime <= 0)) ) {
             spawnPowerUps(boardWidth, boardHeight, tileSize, gamePanel.getBlockedTiles());
             scheduleNextPowerUp();
-            // currentPowerUp.resetPosition();
+            // currentPowerUp.resetPosition()
         }
 
         endEffect();
@@ -83,24 +87,25 @@ public class PowerUpManager {
             case 2 : currentPowerUp = new PowerUps_SpeedBoost(this, x, y, tileSize, boardWidth, boardHeight, scoreManager); break;
         }
 
+        entityManager.addEntity(currentPowerUp);
+
     }
 
     private void scheduleNextPowerUp() {
         long randomSec =  10 + (long) random.nextInt(6);
         nextSpawnTime = System.currentTimeMillis() + (randomSec * 1000);
-
     }
 
     public void applyPowerUp() {
         currentPowerUp.applyPowerUp(gamePanel);
         boostIsActive = true;
-        currentPowerUp = null;
+        currentPowerUp.destroy();
     } // note: Objects already change the end time
 
     public void endEffect () {
         if (boostIsActive && (System.currentTimeMillis() > powerUpEndTime)) {
             gamePanel.resetPowerUpEffects();
-        boostIsActive = false;
+            boostIsActive = false;
         } 
     }
 

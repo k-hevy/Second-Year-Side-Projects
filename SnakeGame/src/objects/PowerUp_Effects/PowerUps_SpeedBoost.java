@@ -25,5 +25,8 @@ public class PowerUps_SpeedBoost extends PowerUps {
         g.fillOval(powerUp.getX() * tileSize, powerUp.getY() * tileSize, tileSize, tileSize);
     }
     
-
+    @Override
+    public void update() {
+        
+    }
 }

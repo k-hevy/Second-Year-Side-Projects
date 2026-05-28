@@ -25,4 +25,9 @@ public class PowerUps_DoublePoints extends PowerUps {
         g.fillOval(powerUp.getX() * tileSize, powerUp.getY() * tileSize, tileSize, tileSize);
     }
 
+    @Override
+    public void update() {
+        
+    }
+
 }
