@@ -1,5 +1,6 @@
 package managers;
 
+import objects.Particle;
 import objects.Tile;
 import objects.PowerUp_Effects.PowerUps;
 import objects.PowerUp_Effects.PowerUps_BigPoints;
@@ -46,6 +47,7 @@ public class PowerUpManager {
 
         if ((currentPowerUp ==  null  && (currentTime >= nextSpawnTime)) ||
             (currentPowerUp != null && (nextSpawnTime - currentTime <= 0)) ) {
+            if (currentPowerUp != null) currentPowerUp.destroy();
             spawnPowerUps(boardWidth, boardHeight, tileSize, gamePanel.getBlockedTiles());
             scheduleNextPowerUp();
             // currentPowerUp.resetPosition()
@@ -97,6 +99,13 @@ public class PowerUpManager {
     }
 
     public void applyPowerUp() {
+
+        for (int i = 0; i < 10; i++) {
+            entityManager.addEntity(new Particle(
+                (float) currentPowerUp.getX() * tileSize + 6, 
+                (float) currentPowerUp.getY() * tileSize + 6));
+        }
+
         currentPowerUp.applyPowerUp(gamePanel);
         boostIsActive = true;
         currentPowerUp.destroy();
@@ -110,6 +119,7 @@ public class PowerUpManager {
     }
 
     public void reset() {
+        if (currentPowerUp != null) currentPowerUp.destroy();
         scheduleNextPowerUp();
     }
 

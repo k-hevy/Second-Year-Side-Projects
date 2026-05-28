@@ -15,9 +15,10 @@ public class PowerUps_BigPoints extends PowerUps   {
 
     @Override
     public void applyPowerUp(GamePanel gamePanel) {
-
         powerUpManager.setPowerUpEndTime(System.currentTimeMillis() + 300);
         scoreManager.addPoints(5);
+
+        
     }
 
     @Override

@@ -6,6 +6,7 @@ import objects.Snake;
 import objects.Tile;
 import user_interface.GamePanel;
 
+
 public class CollisionManager {
 
     private GamePanel gamePanel;

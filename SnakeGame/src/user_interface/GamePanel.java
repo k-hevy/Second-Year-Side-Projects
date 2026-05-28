@@ -11,7 +11,7 @@ import java.util.Random;
 import objects.Food;
 import objects.Snake;
 import objects.Tile;
-
+import objects.Particle;
 import objects.GameState;
 import objects.Obstacle;
 
@@ -151,7 +151,6 @@ public class GamePanel extends JPanel implements ActionListener {
         if (gameStateManager.getGameState() != GameState.PLAYING) return;
         
         snake.move();
-
         scoreManager.update();
         collisionManager.update();
         powerUpManager.update(); // 
@@ -160,6 +159,13 @@ public class GamePanel extends JPanel implements ActionListener {
     }   
 
     public void handleFoodEaten() {
+
+        for (int i = 0; i < 10; i++) {
+            entityManager.addEntity(new Particle(
+                (float) food.getFoodTile().getX() * tileSize + 12, 
+                (float) food.getFoodTile().getY() * tileSize + 12));
+        }
+
         scoreManager.setScore(scoreManager.getScore() + (1 * scoreManager.getMultiplier()));
         food.randomizeFood();
         snake.grow();
@@ -168,7 +174,6 @@ public class GamePanel extends JPanel implements ActionListener {
             delay -= 4;
             if (!powerUpManager.isEffectActive()) gameLoop.setDelay(delay);
         }
-
     }
 
     public void resetPowerUpEffects () {
