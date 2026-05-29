@@ -36,9 +36,13 @@ public class GamePanel extends JPanel implements ActionListener {
     int tileSize = 25;
 
     //Timers
-    final int startDelay = 140;
-    int delay = 140;
-    final int minDelay = 90;
+    long lastTime;
+    double deltaTime;
+
+    double moveTimer;
+    double moveInterval;
+    double baseMoveInterval;
+    double speedLevel;
 
     // Objects
     public Snake snake;
@@ -98,9 +102,17 @@ public class GamePanel extends JPanel implements ActionListener {
         collisionManager = new CollisionManager(soundManager, this, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
         
         entityManager.addEntity(food);
+
         // game Timer
-        gameLoop = new Timer(startDelay, this);
+        
+        gameLoop = new Timer(16, this);
         gameLoop.start();
+
+        lastTime = System.nanoTime();
+        moveTimer = 0;
+        baseMoveInterval = 0.15;
+        moveInterval = baseMoveInterval;
+        speedLevel = 1;
 
     }
 
@@ -122,6 +134,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void resetGame() {
 
+        speedLevel = 1;
+        moveInterval = baseMoveInterval;
         snake.reset();
         food.reset();
         obstacle.reset();
@@ -129,8 +143,7 @@ public class GamePanel extends JPanel implements ActionListener {
         scoreManager.reset();
 
         gameLoop.start();
-        gameLoop.setDelay(startDelay);
-        delay = 140;
+        gameLoop.setDelay(16);
         
         repaint();
 
@@ -150,8 +163,18 @@ public class GamePanel extends JPanel implements ActionListener {
     public void update() {
 
         if (gameStateManager.getGameState() != GameState.PLAYING) return;
-        
-        snake.move();
+
+        long now = System.nanoTime();
+        deltaTime = (now - lastTime) / 1_000_000_000.0;
+        lastTime = now;
+
+        moveTimer = moveTimer + deltaTime;
+
+        if (moveTimer >= moveInterval) {
+            snake.move();
+            moveTimer = 0;
+        }
+
         scoreManager.update();
         collisionManager.update();
         powerUpManager.update(); // 
@@ -172,19 +195,24 @@ public class GamePanel extends JPanel implements ActionListener {
         food.randomizeFood();
         snake.grow();
 
-        if (scoreManager.getScore() % 5 == 0 && delay > minDelay) {
-            delay -= 4;
-            if (!powerUpManager.isEffectActive()) gameLoop.setDelay(delay);
+        if (scoreManager.getScore() % 5 == 0 && moveInterval > 0.05) {
+            speedLevel += 0.05;
+            if (speedLevel == 2.5) speedLevel = 2.5;
+            if (!powerUpManager.isEffectActive()) moveInterval = baseMoveInterval / speedLevel;
         }
     }
 
     public void resetPowerUpEffects () {
         scoreManager.setMultiplier(1);
-        gameLoop.setDelay(delay);
+        moveInterval = baseMoveInterval / speedLevel;
     }
 
-    public Timer getGameLoopTimer () {
-        return gameLoop;
+    public double getBaseMoveInterval() {
+        return baseMoveInterval / speedLevel;
+    }
+
+    public void setMoveInterval(double num) {
+        moveInterval = num;
     }
 
     public ArrayList<Tile> getBlockedTiles() {
@@ -231,7 +259,7 @@ public class GamePanel extends JPanel implements ActionListener {
         g.drawString("Score: " + scoreManager.getScore(), tileSize - 16, tileSize);
         g.drawString("Highscore: " + scoreManager.getHighscore(), tileSize - 16 , tileSize + 25);
         g.drawString("Level: " + scoreManager.getLevel(), tileSize - 16 , tileSize + 50);
-        g.drawString("Speed: " + delay, tileSize - 16 , tileSize + 75);
+        g.drawString("Speed: " + moveInterval, tileSize - 16 , tileSize + 75);
         g.drawString("Next powerUp: " + (powerUpManager.getNextPowerUpTime() - System.currentTimeMillis()) / 1000 + "s", tileSize - 16 , tileSize + 100);
         // g.drawString("PowerUp type " + cou, tileSize - 16 , tileSize + 125);
         

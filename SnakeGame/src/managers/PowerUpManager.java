@@ -111,6 +111,7 @@ public class PowerUpManager {
         currentPowerUp.applyPowerUp(gamePanel);
         boostIsActive = true;
         currentPowerUp.destroy();
+        currentPowerUp = null;
     } // note: Objects already change the end time
 
     public void endEffect () {

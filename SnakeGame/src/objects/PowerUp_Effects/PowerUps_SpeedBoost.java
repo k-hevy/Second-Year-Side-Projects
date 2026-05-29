@@ -16,7 +16,7 @@ public class PowerUps_SpeedBoost extends PowerUps {
     @Override
     public void applyPowerUp(GamePanel gamePanel) {
         powerUpManager.setPowerUpEndTime(System.currentTimeMillis() + 8000);
-        gamePanel.getGameLoopTimer().setDelay(80);
+        gamePanel.setMoveInterval(gamePanel.getBaseMoveInterval() * 0.80);
     }
 
     @Override
