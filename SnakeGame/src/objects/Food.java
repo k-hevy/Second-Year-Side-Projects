@@ -1,13 +1,17 @@
 package objects;
 import java.util.Random;
+
+import managers.EntityManager;
+
 import java.awt.*;
 
-public class Food {
+public class Food extends Entity {
 
     Tile foodTile;
     Random random;
     Snake snake;
     Obstacle obstacle;
+    EntityManager entityManager;
 
     int boardwidth;
     int boardHeight;
@@ -19,6 +23,7 @@ public class Food {
         this.boardHeight = boardHeight;
         this.tileSize = tileSize;
         obstacle = new Obstacle(tileSize, boardWidth, boardHeight);
+        entityManager = new EntityManager();
 
         random = new Random();
         foodTile = new Tile(0, 0);
@@ -55,14 +60,7 @@ public class Food {
             }
 
         } while (onSnake || onObstacle);
-        
     } 
-
-    public void draw(Graphics g, int tileSize) {
-        //food
-        g.setColor(Color.MAGENTA);
-        g.fill3DRect(foodTile.getX() * tileSize, foodTile.getY() * tileSize, tileSize, tileSize, true);
-    }
 
     public void reset() {
         randomizeFood();
@@ -70,6 +68,16 @@ public class Food {
 
     public Tile getFoodTile() {
         return foodTile;
+    }
+
+    @Override
+    public void update() {
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.MAGENTA);
+        g.fill3DRect(foodTile.getX() * tileSize, foodTile.getY() * tileSize, tileSize, tileSize, true);
     }
 
 }

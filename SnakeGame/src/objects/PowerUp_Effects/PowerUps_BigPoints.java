@@ -32,4 +32,9 @@ public class PowerUps_BigPoints extends PowerUps   {
         
     }
 
+    @Override
+    public int getPowerUpType() {
+        return 1;
+    }
+
 }

@@ -29,4 +29,9 @@ public class PowerUps_SpeedBoost extends PowerUps {
     public void update() {
         
     }
+
+    @Override
+    public int getPowerUpType() {
+        return 3;
+    }
 }

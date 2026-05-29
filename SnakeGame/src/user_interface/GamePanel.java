@@ -97,6 +97,7 @@ public class GamePanel extends JPanel implements ActionListener {
         powerUpManager = new PowerUpManager(this, boardWidth, boardHeight, tileSize, scoreManager, entityManager);
         collisionManager = new CollisionManager(soundManager, this, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
         
+        entityManager.addEntity(food);
         // game Timer
         gameLoop = new Timer(startDelay, this);
         gameLoop.start();
@@ -163,7 +164,8 @@ public class GamePanel extends JPanel implements ActionListener {
         for (int i = 0; i < 10; i++) {
             entityManager.addEntity(new Particle(
                 (float) food.getFoodTile().getX() * tileSize + 12, 
-                (float) food.getFoodTile().getY() * tileSize + 12));
+                (float) food.getFoodTile().getY() * tileSize + 12, 
+                0));
         }
 
         scoreManager.setScore(scoreManager.getScore() + (1 * scoreManager.getMultiplier()));
@@ -197,7 +199,6 @@ public class GamePanel extends JPanel implements ActionListener {
     public void render(Graphics g) {
 
     snake.draw(g, tileSize);
-    food.draw(g, tileSize);
     obstacle.drawObstacles(g, tileSize);
     entityManager.draw(g);
 

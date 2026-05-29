@@ -30,4 +30,9 @@ public class PowerUps_DoublePoints extends PowerUps {
         
     }
 
+    @Override
+    public int getPowerUpType() {
+        return 2;
+    }
+
 }

@@ -100,10 +100,12 @@ public class PowerUpManager {
 
     public void applyPowerUp() {
 
+        int type =  currentPowerUp.getPowerUpType();
+
         for (int i = 0; i < 10; i++) {
             entityManager.addEntity(new Particle(
                 (float) currentPowerUp.getX() * tileSize + 6, 
-                (float) currentPowerUp.getY() * tileSize + 6));
+                (float) currentPowerUp.getY() * tileSize + 6, type));
         }
 
         currentPowerUp.applyPowerUp(gamePanel);

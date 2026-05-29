@@ -50,4 +50,6 @@ public abstract class PowerUps extends Entity {
 
     public abstract void applyPowerUp(GamePanel gamePanel);
 
+    public abstract int getPowerUpType();
+
 }
