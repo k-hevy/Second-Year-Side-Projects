@@ -1,5 +1,7 @@
 package managers;
 
+import objects.Event;
+import objects.EventType;
 import objects.Food;
 import objects.Obstacle;
 import objects.Snake;
@@ -12,6 +14,7 @@ public class CollisionManager {
     private GamePanel gamePanel;
     private PowerUpManager powerUpManager;
     private SoundManager soundManager;
+    private EventManager eventManager;
     private Obstacle obstacle;
     private Snake snake;
     private Food food;
@@ -44,8 +47,7 @@ public class CollisionManager {
     public void checkFoodCollision () {
         if (snake.getHead().getX() == food.getFoodTile().getX() &&
             snake.getHead().getY() == food.getFoodTile().getY()) {
-                gamePanel.handleFoodEaten();
-                SoundManager.playSound(SoundManager.SoundEffect.EAT_FOOD);
+            eventManager.fireEvent(new Event(EventType.FOOD_EATEN));
         }
     }
 
@@ -55,8 +57,7 @@ public class CollisionManager {
             if (snake.getHead().getX() == snakePart.getX() &&
                 snake.getHead().getY() == snakePart.getY()
             ) {
-                gamePanel.gameOver(); 
-                SoundManager.playSound(SoundManager.SoundEffect.COLLISION);
+                eventManager.fireEvent(new Event(EventType.GAME_OVER));
             }
         }
     }
@@ -65,8 +66,7 @@ public class CollisionManager {
         if (powerUpManager.getPowerUps() != null && 
             snake.getHead().getX() == powerUpManager.getPowerUps().getX() &&
             snake.getHead().getY() == powerUpManager.getPowerUps().getY()) {
-                powerUpManager.applyPowerUp();
-                SoundManager.playSound(SoundManager.SoundEffect.POWERUP);
+                eventManager.fireEvent(new Event(EventType.POWERUP_COLLECTED));
         }
     }
 
@@ -77,8 +77,7 @@ public class CollisionManager {
             snake.getHead().getY() >= boardHeight/tileSize || 
             snake.getHead().getY() * tileSize < 0
         ) {
-            gamePanel.gameOver(); 
-            SoundManager.playSound(SoundManager.SoundEffect.GAME_OVER);
+            eventManager.fireEvent(new Event(EventType.GAME_OVER));
         }
         
     }
@@ -87,8 +86,7 @@ public class CollisionManager {
         for (Tile part : obstacle.getObstacles()) {
             if (snake.getHead().getX() == part.getX() && snake.getHead().getY() == part.getY()
             ) {
-            gamePanel.gameOver(); 
-            SoundManager.playSound(SoundManager.SoundEffect.GAME_OVER);
+        eventManager.fireEvent(new Event(EventType.GAME_OVER));
         }
         }
     }

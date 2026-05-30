@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Random;
 
+import objects.Event;
 import objects.Food;
 import objects.Snake;
 import objects.Tile;
@@ -22,6 +23,7 @@ import managers.PowerUpManager;
 import managers.ScoreManager;
 import managers.SoundManager;
 import managers.EntityManager;
+import managers.EventManager;
 
 public class GamePanel extends JPanel implements ActionListener {
 
@@ -59,6 +61,7 @@ public class GamePanel extends JPanel implements ActionListener {
     ScoreManager scoreManager;
     SoundManager soundManager;
     EntityManager entityManager;
+    EventManager eventManager;
 
     // Game logic
     Timer gameLoop;
@@ -92,6 +95,7 @@ public class GamePanel extends JPanel implements ActionListener {
         blockedTiles = new ArrayList<Tile>();
 
         // Managers
+        eventManager = new EventManager();
         this.gameStateManager = gameStateManager;
         soundManager = new SoundManager();
         input = new InputManager(snake, this);
@@ -126,7 +130,6 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void gameOver() {
-
         gameLoop.stop();
         parent.showGameOver();
 
@@ -175,6 +178,26 @@ public class GamePanel extends JPanel implements ActionListener {
             moveTimer = 0;
         }
 
+        for (Event e : eventManager.getEvents()) {
+            switch (e.getType()) {
+                case FOOD_EATEN :
+                    handleFoodEaten();
+                    SoundManager.playSound(SoundManager.SoundEffect.EAT_FOOD);
+                    break;
+
+                case GAME_OVER :
+                    gameOver(); 
+                    SoundManager.playSound(SoundManager.SoundEffect.COLLISION);
+                    break;
+
+                case POWERUP_COLLECTED :
+                    powerUpManager.applyPowerUp();
+                    SoundManager.playSound(SoundManager.SoundEffect.POWERUP);
+                    break;
+            }
+        }
+
+        eventManager.clearEvent();
         scoreManager.update();
         collisionManager.update();
         powerUpManager.update(); // 
@@ -197,9 +220,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
         if (scoreManager.getScore() % 5 == 0 && moveInterval > 0.05) {
             speedLevel += 0.05;
-            if (speedLevel == 2.5) speedLevel = 2.5;
+            if (speedLevel >= 2.5) speedLevel = 2.5;
             if (!powerUpManager.isEffectActive()) moveInterval = baseMoveInterval / speedLevel;
         }
+
     }
 
     public void resetPowerUpEffects () {

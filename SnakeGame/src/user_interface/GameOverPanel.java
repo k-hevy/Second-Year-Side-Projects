@@ -3,7 +3,7 @@ package user_interface;
 import javax.swing.*;
 import java.awt.*;
 
-public class GameOverPanel extends JPanel {
+public class GameOverPanel extends JPanel  {
 
     JLabel label;
     JButton tryAgainBTN;
