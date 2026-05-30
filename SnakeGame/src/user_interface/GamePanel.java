@@ -46,6 +46,11 @@ public class GamePanel extends JPanel implements ActionListener {
     double baseMoveInterval;
     double speedLevel;
 
+    private int shakeDuration;
+    private int shakeIntensity;
+    private boolean gameOverPending;
+    
+
     // Objects
     public Snake snake;
     Food food;
@@ -93,6 +98,7 @@ public class GamePanel extends JPanel implements ActionListener {
         // Background prep
         obstacle.generateObstacles();
         blockedTiles = new ArrayList<Tile>();
+        SoundManager.playBackgroundMusic();
 
         // Managers
         eventManager = new EventManager();
@@ -103,7 +109,7 @@ public class GamePanel extends JPanel implements ActionListener {
         scoreManager = new ScoreManager();
         entityManager = new EntityManager();
         powerUpManager = new PowerUpManager(this, boardWidth, boardHeight, tileSize, scoreManager, entityManager);
-        collisionManager = new CollisionManager(soundManager, this, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
+        collisionManager = new CollisionManager(eventManager, powerUpManager, obstacle, snake, food, boardWidth, boardHeight, tileSize);
         
         entityManager.addEntity(food);
 
@@ -111,12 +117,17 @@ public class GamePanel extends JPanel implements ActionListener {
         
         gameLoop = new Timer(16, this);
         gameLoop.start();
+        
 
         lastTime = System.nanoTime();
         moveTimer = 0;
         baseMoveInterval = 0.15;
         moveInterval = baseMoveInterval;
         speedLevel = 1;
+
+        shakeIntensity = 8;
+        shakeDuration = 0;
+        gameOverPending = false;
 
     }
 
@@ -130,9 +141,9 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void gameOver() {
+        SoundManager.stopMusic();
         gameLoop.stop();
         parent.showGameOver();
-
     } 
 
     public void resetGame() {
@@ -144,7 +155,9 @@ public class GamePanel extends JPanel implements ActionListener {
         obstacle.reset();
         powerUpManager.reset();
         scoreManager.reset();
+        eventManager.clearEvent();
 
+        SoundManager.playBackgroundMusic();
         gameLoop.start();
         gameLoop.setDelay(16);
         
@@ -165,18 +178,29 @@ public class GamePanel extends JPanel implements ActionListener {
     // Game Logic
     public void update() {
 
+        System.out.println(shakeDuration);
+
         if (gameStateManager.getGameState() != GameState.PLAYING) return;
 
         long now = System.nanoTime();
         deltaTime = (now - lastTime) / 1_000_000_000.0;
         lastTime = now;
 
-        moveTimer = moveTimer + deltaTime;
+        if (!gameOverPending) {
+            moveTimer = moveTimer + deltaTime;
 
-        if (moveTimer >= moveInterval) {
-            snake.move();
-            moveTimer = 0;
+            if (moveTimer >= moveInterval) {
+                snake.move();
+                moveTimer = 0;
+            }
+
+            eventManager.clearEvent();
+            scoreManager.update();
+            collisionManager.update();
+            powerUpManager.update(); // 
+            entityManager.update();
         }
+        
 
         for (Event e : eventManager.getEvents()) {
             switch (e.getType()) {
@@ -186,8 +210,11 @@ public class GamePanel extends JPanel implements ActionListener {
                     break;
 
                 case GAME_OVER :
-                    gameOver(); 
-                    SoundManager.playSound(SoundManager.SoundEffect.COLLISION);
+                    if (!gameOverPending) {
+                        shakeDuration = 60;
+                        gameOverPending = true;
+                        SoundManager.playSound(SoundManager.SoundEffect.COLLISION);
+                    }
                     break;
 
                 case POWERUP_COLLECTED :
@@ -195,13 +222,16 @@ public class GamePanel extends JPanel implements ActionListener {
                     SoundManager.playSound(SoundManager.SoundEffect.POWERUP);
                     break;
             }
+
+            System.out.println(e.getType());
         }
 
-        eventManager.clearEvent();
-        scoreManager.update();
-        collisionManager.update();
-        powerUpManager.update(); // 
-        entityManager.update();
+        if (shakeDuration > 0) {
+            shakeDuration--;
+        } else if (gameOverPending) {
+            gameOverPending = false;
+            gameOver();
+        }
 
     }   
 
@@ -250,18 +280,36 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void render(Graphics g) {
 
-    snake.draw(g, tileSize);
-    obstacle.drawObstacles(g, tileSize);
-    entityManager.draw(g);
+        Graphics2D g2 = (Graphics2D) g.create();
 
-    g.setColor(Color.BLUE);
-    
-    // score
-    g.setFont(new Font("Arial", Font.PLAIN, 16));
-    drawHudAndScores(g);
+        if (shakeDuration > 0) {
+            int offSetX =  random.nextInt(shakeIntensity);
+            int offSetY =  random.nextInt(shakeIntensity);
+            g2.translate(offSetX, offSetY);
+        }
 
-    if (gameStateManager.getGameState() == GameState.PAUSED) drawPausedOverlay(g);
+        snake.draw(g2, tileSize);
+        obstacle.drawObstacles(g2, tileSize);
+        entityManager.draw(g2);
 
+        g2.setColor(Color.BLUE);
+        
+        // score
+        g2.setFont(new Font("Arial", Font.PLAIN, 16));
+        drawHudAndScores(g);
+
+        if (gameStateManager.getGameState() == GameState.PAUSED) drawPausedOverlay(g2);
+
+        g2.dispose();
+
+    }
+
+    public void setGameOverPending(boolean value) {
+        gameOverPending = value;
+    }
+
+    public void setScreenShake(int num) {
+        shakeDuration = num;
     }
 
     // visual painting

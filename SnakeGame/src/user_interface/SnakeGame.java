@@ -5,6 +5,7 @@ import javax.swing.*;
 import managers.GameStateManager;
 import objects.GameState;
 
+
 public class SnakeGame extends JFrame {
 
     JPanel mainPanel;

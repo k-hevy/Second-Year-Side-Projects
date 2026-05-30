@@ -6,6 +6,8 @@ import java.net.URL;
 
 public class SoundManager {
 
+    public static Clip backgroundClip;
+
     public enum SoundEffect {
 
         EAT_FOOD("eat.wav"),
@@ -50,5 +52,39 @@ public class SoundManager {
         }).start();
 
     }
+
+    public static void playBackgroundMusic() {
+
+        try {
+
+            if (backgroundClip != null && backgroundClip.isRunning()) return;
+
+            URL soundURL = SoundManager.class.getResource(SOUND_FOLDER + SoundEffect.BACKGROUND_MUSIC.getFileName());
+            if (soundURL == null) {
+                        System.out.println("Sound file not found: " + SoundEffect.BACKGROUND_MUSIC.getFileName());
+                        return;
+            }
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundURL);
+            backgroundClip = AudioSystem.getClip();
+            backgroundClip.open(audioStream);
+
+            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
+            backgroundClip.start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void stopMusic() {
+            if (backgroundClip != null) {
+                backgroundClip.stop();
+                backgroundClip.close();
+                backgroundClip = null;
+            }
+        }
+        
 
 }

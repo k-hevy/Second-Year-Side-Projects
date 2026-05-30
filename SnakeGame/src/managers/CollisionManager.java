@@ -6,15 +6,12 @@ import objects.Food;
 import objects.Obstacle;
 import objects.Snake;
 import objects.Tile;
-import user_interface.GamePanel;
-
 
 public class CollisionManager {
 
-    private GamePanel gamePanel;
     private PowerUpManager powerUpManager;
-    private SoundManager soundManager;
     private EventManager eventManager;
+
     private Obstacle obstacle;
     private Snake snake;
     private Food food;
@@ -22,11 +19,9 @@ public class CollisionManager {
     private int boardHeight;
     private int tileSize;
     
-    public CollisionManager(SoundManager soundManager, GamePanel gamePanel, PowerUpManager powerUpManager,
-        Obstacle obstacle, Snake snake, Food food, int boardWidth, int boardHeight,
-        int tileSize) {
-        this.gamePanel = gamePanel;
-        this.soundManager = soundManager;
+    public CollisionManager(EventManager eventManager, PowerUpManager powerUpManager, Obstacle obstacle, Snake snake, Food food, 
+        int boardWidth, int boardHeight, int tileSize) {
+        this.eventManager = eventManager;
         this.powerUpManager = powerUpManager;
         this.obstacle = obstacle;
         this.snake = snake;
@@ -34,6 +29,7 @@ public class CollisionManager {
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         this.tileSize = tileSize;
+        eventManager = new EventManager();
     }
 
     public void update() {
@@ -56,8 +52,7 @@ public class CollisionManager {
         for (Tile snakePart : snake.getBody()) {
             if (snake.getHead().getX() == snakePart.getX() &&
                 snake.getHead().getY() == snakePart.getY()
-            ) {
-                eventManager.fireEvent(new Event(EventType.GAME_OVER));
+            ) { eventManager.fireEvent(new Event(EventType.GAME_OVER));
             }
         }
     }
@@ -85,8 +80,7 @@ public class CollisionManager {
     public void checkObstacleCollision() {
         for (Tile part : obstacle.getObstacles()) {
             if (snake.getHead().getX() == part.getX() && snake.getHead().getY() == part.getY()
-            ) {
-        eventManager.fireEvent(new Event(EventType.GAME_OVER));
+            ) { eventManager.fireEvent(new Event(EventType.GAME_OVER));
         }
         }
     }

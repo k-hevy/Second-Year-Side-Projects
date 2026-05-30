@@ -8,11 +8,8 @@ public class MenuPanel extends JPanel {
     JLabel label;
     JButton startBTN;
     JButton exitBTN;
-    private  SnakeGame parent;
 
     MenuPanel (SnakeGame parent) {
-
-        this.parent = parent;
 
         setLayout( new GridLayout(3, 1));
 

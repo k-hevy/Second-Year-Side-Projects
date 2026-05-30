@@ -6,9 +6,6 @@ import objects.Event;
 
 public class EventManager {
 
-    public EventManager () {
-    }
-
     private ArrayList<Event> events = new ArrayList<Event>();
 
     public void fireEvent(Event event) {

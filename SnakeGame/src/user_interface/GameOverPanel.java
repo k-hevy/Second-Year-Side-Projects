@@ -9,11 +9,8 @@ public class GameOverPanel extends JPanel  {
     JButton tryAgainBTN;
     JButton menuBTN;
 
-    private SnakeGame parent;
     
     GameOverPanel (SnakeGame parent) {
-
-        this.parent = parent;
 
         setLayout(new GridLayout(3, 1));
 

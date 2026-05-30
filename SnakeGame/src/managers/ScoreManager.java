@@ -11,7 +11,6 @@ public class ScoreManager {
     private int highscore;
     private int level;
     private int multiplier = 1;
-    private PowerUpManager powerUpManager;
 
     public ScoreManager() {
         loadHighscore();
