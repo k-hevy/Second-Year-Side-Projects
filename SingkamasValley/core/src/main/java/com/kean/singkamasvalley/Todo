@@ -1,0 +1,21 @@
+
+
+com.kean.singkamasvalley
+│
+├── SingkamasValley.java
+│
+├── screens
+│   ├── GameScreen.java
+│   ├── MenuScreen.java
+│   └── PauseScreen.java
+│
+├── entities
+│   └── Player.java
+│
+├── world
+│   ├── Tile.java
+│   └── FarmWorld.java
+│
+└── managers
+    ├── InputManager.java
+    └── AssetManager.java
