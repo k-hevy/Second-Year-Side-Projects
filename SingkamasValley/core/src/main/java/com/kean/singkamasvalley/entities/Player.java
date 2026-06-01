@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.kean.singkamasvalley.world.World;
 
 public class Player {
 
@@ -22,6 +23,7 @@ public class Player {
     private float speed = 100f;
     private Texture playerSpriteSheet;
     private float stateTime;
+    private World world;
 
     private Animation<TextureRegion> walkBackward;
     private Animation<TextureRegion> walkForward;
@@ -29,9 +31,10 @@ public class Player {
     private Animation<TextureRegion> walkRight;
     private Animation<TextureRegion> currentAnimation;
 
-    public Player () {
+    public Player (World world) {
         this.x = 100;
         this.y = 100;
+        this.world = world;
         playerSpriteSheet = new Texture("player_walking_sheet.png");
         TextureRegion[][] tmp = TextureRegion.split(
             playerSpriteSheet,
@@ -59,25 +62,38 @@ public class Player {
 
         boolean moving = false;
 
+        float newX = x;
+        float newY = y;
+
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            y += speed * delta;
+            newY += speed * delta;
             direction = Direction.BACKWARD;
             moving = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            x += speed * delta;
+            newX += speed * delta;
             direction = Direction.RIGHT;
             moving = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            y -= speed * delta;
+            newY -= speed * delta;
             direction = Direction.FORWARD;
             moving = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            x -= speed * delta;
+            newX -= speed * delta;
             direction = Direction.LEFT;
             moving = true;
+        }
+
+
+
+        if (world.getTileAt(newX, y) != null && !world.getTileAt(newX, y).getType().isSolid()) {
+            x = newX;
+        }
+
+        if (world.getTileAt(x, newY) != null && !world.getTileAt(x, newY).getType().isSolid()) {
+            y = newY;
         }
 
         switch(direction) {

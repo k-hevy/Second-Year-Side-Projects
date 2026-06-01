@@ -7,11 +7,17 @@ public class Tile {
 
     private final Texture texture;
     private final float x, y;
+    private final TileType tileType;
 
-    public Tile (Texture texture, float x, float y) {
+    public Tile (Texture texture, TileType tileType, float x, float y) {
         this.texture = texture;
+        this.tileType = tileType;
         this.x = x;
         this.y =y;
+    }
+
+    public TileType getType() {
+        return tileType;
     }
 
     public void render(SpriteBatch spriteBatch) {

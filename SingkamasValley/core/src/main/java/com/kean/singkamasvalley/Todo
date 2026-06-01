@@ -19,3 +19,6 @@ com.kean.singkamasvalley
 └── managers
     ├── InputManager.java
     └── AssetManager.java
+
+
+// fix Array vs world grid mismatch

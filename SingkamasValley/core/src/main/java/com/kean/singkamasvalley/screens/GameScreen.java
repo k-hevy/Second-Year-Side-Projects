@@ -23,8 +23,9 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 800, 400);
         System.out.println("Game Screen Loaded");
         spriteBatch = new SpriteBatch();
-        player = new Player();
         world = new World();
+        player = new Player(world);
+
     }
 
     @Override
@@ -33,23 +34,27 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f );
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        camera.update();
-        spriteBatch.setProjectionMatrix(camera.combined);
-
+        //updating positions
         player.update(delta); // for when the player is walking
+        camera.position.set(player.getX(), player.getY(), 0); // adjust camera location
+        camera.update(); // updates position
+
+        spriteBatch.setProjectionMatrix(camera.combined); // after camera update but before batch.begin (to avoid flushes to teh GPU)
+
+
         spriteBatch.begin(); // starts drawing
 
         world.render(spriteBatch);
         player.render(spriteBatch); // renders player png
 
-        camera.position.set(player.getX(), player.getY(), 0);
-
         spriteBatch.end();
+
     }
 
     @Override public void resize(int width, int height) {
         spriteBatch.getProjectionMatrix().setToOrtho2D(0,0, width, height);
     }
+
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
@@ -57,6 +62,7 @@ public class GameScreen implements Screen {
     @Override public void dispose() {
         spriteBatch.dispose();
         player.dispose();
+        world.dispose();
     }
 
 }
