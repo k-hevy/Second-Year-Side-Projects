@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.kean.singkamasvalley.entities.Player;
+import com.kean.singkamasvalley.managers.CollisionManager;
+import com.kean.singkamasvalley.managers.MapManager;
 import com.kean.singkamasvalley.world.World;
 
 public class GameScreen implements Screen {
@@ -14,6 +16,8 @@ public class GameScreen implements Screen {
     private Player player;
     private OrthographicCamera camera;
     private World world;
+    private MapManager mapManager;
+    private CollisionManager collisionManager;
 
     public GameScreen () {}
 
@@ -21,10 +25,14 @@ public class GameScreen implements Screen {
     public void show() {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 400);
-        System.out.println("Game Screen Loaded");
+
         spriteBatch = new SpriteBatch();
+
+        mapManager = new MapManager(spriteBatch);
+        collisionManager = new CollisionManager(mapManager.getTiledMap());
+
         world = new World();
-        player = new Player(world);
+        player = new Player(collisionManager);
 
     }
 
@@ -44,7 +52,7 @@ public class GameScreen implements Screen {
 
         spriteBatch.begin(); // starts drawing
 
-        world.render(spriteBatch);
+        mapManager.render(camera, spriteBatch);
         player.render(spriteBatch); // renders player png
 
         spriteBatch.end();

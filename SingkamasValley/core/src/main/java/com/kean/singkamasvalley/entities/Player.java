@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.kean.singkamasvalley.world.World;
+import com.kean.singkamasvalley.managers.CollisionManager;
 
 public class Player {
 
@@ -14,28 +14,31 @@ public class Player {
         FORWARD,
         BACKWARD,
         LEFT,
-        RIGHT;
+        RIGHT
     }
 
     private Direction direction = Direction.FORWARD;
 
     private float x, y;
-    private float speed = 100f;
-    private Texture playerSpriteSheet;
+    private final float speed = 100f;
+    private final Texture playerSpriteSheet;
     private float stateTime;
-    private World world;
 
-    private Animation<TextureRegion> walkBackward;
-    private Animation<TextureRegion> walkForward;
-    private Animation<TextureRegion> walkLeft;
-    private Animation<TextureRegion> walkRight;
+    private final Animation<TextureRegion> walkBackward;
+    private final Animation<TextureRegion> walkForward;
+    private final Animation<TextureRegion> walkLeft;
+    private final Animation<TextureRegion> walkRight;
     private Animation<TextureRegion> currentAnimation;
+    private CollisionManager collisionManager;
 
-    public Player (World world) {
+    public Player (CollisionManager collisionManager) {
+
         this.x = 100;
         this.y = 100;
-        this.world = world;
+        this.collisionManager = collisionManager;
+
         playerSpriteSheet = new Texture("player_walking_sheet.png");
+
         TextureRegion[][] tmp = TextureRegion.split(
             playerSpriteSheet,
             playerSpriteSheet.getWidth() / 4,
@@ -48,6 +51,7 @@ public class Player {
         walkLeft = new Animation<>(0.15f, tmp[3]);
 
         currentAnimation = walkForward;
+
     }
 
     public float getX() {
@@ -86,15 +90,19 @@ public class Player {
             moving = true;
         }
 
+        x = newX;
+        y = newY;
 
 
-        if (world.getTileAt(newX, y) != null && !world.getTileAt(newX, y).getType().isSolid()) {
-            x = newX;
-        }
 
-        if (world.getTileAt(x, newY) != null && !world.getTileAt(x, newY).getType().isSolid()) {
-            y = newY;
-        }
+
+//        if (!collisionManager.isBlocked(newX, y)) {
+//            x = newX;
+//        }
+//
+//        if (!collisionManager.isBlocked(x, newY)) {
+//            y = newY;
+//        }
 
         switch(direction) {
             case FORWARD  : currentAnimation = walkForward; break;
