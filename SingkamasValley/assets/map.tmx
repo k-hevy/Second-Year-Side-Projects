@@ -1,50 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="12">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="14">
  <tileset firstgid="1" name="ground" tilewidth="16" tileheight="16" tilecount="4" columns="1">
   <image source="ground.png" width="16" height="64"/>
   <tile id="0">
    <properties>
+    <property name="solid" type="bool" value="false"/>
     <property name="tillable" type="bool" value="true"/>
-    <property name="walkable" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="1">
    <properties>
-    <property name="walkable" type="bool" value="true"/>
+    <property name="solid" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="2">
    <properties>
-    <property name="walkable" type="bool" value="false"/>
+    <property name="solid" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="3">
    <properties>
-    <property name="walkable" type="bool" value="true"/>
+    <property name="solid" type="bool" value="false"/>
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="5" name="objs" tilewidth="96" tileheight="128" tilecount="3" columns="0">
+ <tileset firstgid="5" name="objs" tilewidth="96" tileheight="128" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="1">
    <properties>
     <property name="solid" type="bool" value="true"/>
    </properties>
    <image source="House_1_Wood_Base_Blue.png" width="96" height="128"/>
-  </tile>
-  <tile id="2">
-   <properties>
-    <property name="choopable" type="bool" value="true"/>
-    <property name="solid" type="bool" value="true"/>
-   </properties>
-   <image source="Oak_Tree.png" width="64" height="80"/>
-  </tile>
-  <tile id="3">
-   <properties>
-    <property name="breakable" type="bool" value="true"/>
-    <property name="solid" type="bool" value="true"/>
-   </properties>
-   <image source="Chest.png" width="16" height="16"/>
   </tile>
  </tileset>
  <layer id="1" name="Ground layer" width="20" height="20">
@@ -73,11 +59,13 @@
  </layer>
  <objectgroup id="2" name="objects">
   <object id="4" gid="6" x="11.3333" y="140.667" width="96" height="128"/>
-  <object id="5" gid="7" x="111.333" y="122.667" width="64" height="80"/>
-  <object id="6" gid="7" x="258.667" y="277.333" width="64" height="80"/>
-  <object id="7" gid="7" x="258" y="102" width="64" height="80"/>
-  <object id="8" gid="7" x="232.667" y="198" width="64" height="80"/>
-  <object id="11" gid="8" x="130" y="127.333" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="4" name="collisions">
+  <object id="13" x="27.6364" y="85.4545" width="62.9091" height="39.2727">
+   <properties>
+    <property name="solid" type="bool" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
  <layer id="3" name="special" width="20" height="20">
   <data encoding="csv">

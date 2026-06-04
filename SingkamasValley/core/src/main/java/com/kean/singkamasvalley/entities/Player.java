@@ -20,21 +20,22 @@ public class Player {
     private Direction direction = Direction.FORWARD;
 
     private float x, y;
-    private final float speed = 100f;
     private final Texture playerSpriteSheet;
     private float stateTime;
+    private final int TILE_SIZE = 16;
 
     private final Animation<TextureRegion> walkBackward;
     private final Animation<TextureRegion> walkForward;
     private final Animation<TextureRegion> walkLeft;
     private final Animation<TextureRegion> walkRight;
     private Animation<TextureRegion> currentAnimation;
-    private CollisionManager collisionManager;
+
+    private final CollisionManager collisionManager;
 
     public Player (CollisionManager collisionManager) {
 
-        this.x = 100;
-        this.y = 100;
+        this.x = 200;
+        this.y = 200;
         this.collisionManager = collisionManager;
 
         playerSpriteSheet = new Texture("player_walking_sheet.png");
@@ -62,12 +63,18 @@ public class Player {
         return y;
     }
 
+    public int getTileX () { return (int) x / TILE_SIZE; }
+
+    public int getTileY () { return (int) y / TILE_SIZE; }
+
     public void update(float delta) {
 
         boolean moving = false;
 
         float newX = x;
         float newY = y;
+
+        float speed = 100f;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             newY += speed * delta;
@@ -90,19 +97,17 @@ public class Player {
             moving = true;
         }
 
-        x = newX;
-        y = newY;
+        int tileX = (int) newX / TILE_SIZE;
+        int tileY = (int) newY / TILE_SIZE;
+
+        System.out.println("World Coordinate: " + newX + " " + newY );
+        System.out.println("Tile Coordinate: " + tileX + " " + tileY);
 
 
-
-
-//        if (!collisionManager.isBlocked(newX, y)) {
-//            x = newX;
-//        }
-//
-//        if (!collisionManager.isBlocked(x, newY)) {
-//            y = newY;
-//        }
+        if (!collisionManager.isBlocked(tileX, tileY)) {
+            x = newX;
+            y = newY;
+        }
 
         switch(direction) {
             case FORWARD  : currentAnimation = walkForward; break;
