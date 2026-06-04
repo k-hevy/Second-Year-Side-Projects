@@ -2,9 +2,12 @@ package com.kean.singkamasvalley.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.kean.singkamasvalley.entities.Player;
 import com.kean.singkamasvalley.managers.CollisionManager;
 import com.kean.singkamasvalley.managers.MapManager;
@@ -18,6 +21,8 @@ public class GameScreen implements Screen {
     private World world;
     private MapManager mapManager;
     private CollisionManager collisionManager;
+    private ShapeRenderer shapeRenderer;
+    private static final int TILE_SIZE = 16;
 
     public GameScreen () {}
 
@@ -30,9 +35,10 @@ public class GameScreen implements Screen {
 
         mapManager = new MapManager(spriteBatch);
         collisionManager = new CollisionManager(mapManager.getTiledMap());
+        shapeRenderer = new ShapeRenderer();
 
         world = new World();
-        player = new Player(collisionManager);
+        player = new Player(collisionManager, shapeRenderer);
 
     }
 
@@ -57,6 +63,12 @@ public class GameScreen implements Screen {
 
         spriteBatch.end();
 
+        Rectangle hitbox = player.getHitBox();
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.WHITE);
+        shapeRenderer.rect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+        shapeRenderer.end(); // seperate this from spritebatch cuz causes issues
     }
 
     @Override public void resize(int width, int height) {
