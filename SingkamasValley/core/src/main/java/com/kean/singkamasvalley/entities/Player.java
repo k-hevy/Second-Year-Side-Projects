@@ -7,8 +7,15 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.kean.singkamasvalley.inventory.Inventory;
+import com.kean.singkamasvalley.inventory.Item;
+import com.kean.singkamasvalley.inventory.ItemStack;
+import com.kean.singkamasvalley.inventory.ItemType;
+import com.kean.singkamasvalley.inventory.items.HoeItem;
+import com.kean.singkamasvalley.inventory.items.WoodItem;
 import com.kean.singkamasvalley.managers.CollisionManager;
 import com.kean.singkamasvalley.managers.InteractionManager;
+import com.kean.singkamasvalley.world.GameTile;
 import com.kean.singkamasvalley.world.World;
 
 public class Player implements Renderable {
@@ -38,6 +45,7 @@ public class Player implements Renderable {
     private final CollisionManager collisionManager;
     private final InteractionManager interactionManager;
     private final World world;
+    private Inventory inventory;
 
     public Player (World world, CollisionManager collisionManager,
                    InteractionManager interactionManager) {
@@ -48,9 +56,7 @@ public class Player implements Renderable {
         this.interactionManager = interactionManager;
         this.world = world;
 
-        hitbox = new Rectangle(x+2, y, 12, 8 );
-
-        //sprite = 16x16, hitbox = 12x8
+        hitbox = new Rectangle(x+2, y, 12, 8 ); //sprite = 16x16, hitbox = 12x8
 
         playerSpriteSheet = new Texture("player_walking_sheet.png");
 
@@ -66,6 +72,8 @@ public class Player implements Renderable {
         walkLeft = new Animation<>(0.15f, tmp[3]);
 
         currentAnimation = walkForward;
+
+        inventory = new Inventory();
 
     }
 
@@ -138,9 +146,38 @@ public class Player implements Renderable {
             stateTime += delta;
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+            for (ItemStack stack : inventory.getSlots()) {
+                System.out.println(stack.getItem().getType() + " x" + stack.getQuantity());
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+            inventory.addItem(new WoodItem(), 20);
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             interactionManager.tryInteract(this, world);
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+            Rectangle frontTile = getFrontTile();
+            int tileX = (int) frontTile.x / 16;
+            int tileY = (int) frontTile.y / 16;
+
+            GameTile tile = world.getTile(tileX, tileY);
+
+            if (tile !=  null && !tile.isTilled()) {
+                tile.setTilled(true);
+                System.out.println("Sucecsfully tiled");
+            } else if (tile !=  null && tile.isTilled()) {
+                tile.setTilled(false);
+                System.out.println("Sucecsfully untiled");
+            }
+
+        }
+
 
     }
 

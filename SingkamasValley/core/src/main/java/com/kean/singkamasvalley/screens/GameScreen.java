@@ -43,7 +43,11 @@ public class GameScreen implements Screen {
         mapManager = new MapManager(spriteBatch);
         collisionManager = new CollisionManager(mapManager.getTiledMap());
 
-        world = new World();
+        int i = mapManager.getTiledMap().getProperties().get("width", Integer.class);
+
+        world = new World(mapManager.getTiledMap().getProperties().get("width", Integer.class),
+            mapManager.getTiledMap().getProperties().get("height", Integer.class));
+
         interactionManager = new InteractionManager();
         renderManager = new RenderManager();
 
