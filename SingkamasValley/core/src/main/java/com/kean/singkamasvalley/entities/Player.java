@@ -2,16 +2,16 @@ package com.kean.singkamasvalley.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.kean.singkamasvalley.managers.CollisionManager;
+import com.kean.singkamasvalley.managers.InteractionManager;
+import com.kean.singkamasvalley.world.World;
 
-public class Player {
+public class Player implements Renderable {
 
     private enum Direction {
         FORWARD,
@@ -36,14 +36,17 @@ public class Player {
     private Animation<TextureRegion> currentAnimation;
 
     private final CollisionManager collisionManager;
-    private final ShapeRenderer shapeRenderer;
+    private final InteractionManager interactionManager;
+    private final World world;
 
-    public Player (CollisionManager collisionManager, ShapeRenderer shapeRenderer) {
+    public Player (World world, CollisionManager collisionManager,
+                   InteractionManager interactionManager) {
 
-        this.x = 200;
+        this.x = 216;
         this.y = 200;
         this.collisionManager = collisionManager;
-        this.shapeRenderer = shapeRenderer;
+        this.interactionManager = interactionManager;
+        this.world = world;
 
         hitbox = new Rectangle(x+2, y, 12, 8 );
 
@@ -66,11 +69,11 @@ public class Player {
 
     }
 
-    public float getX() {
+    public float getPlayerX() {
         return x;
     }
 
-    public float getY() {
+    public float getPlayerY() {
         return y;
     }
 
@@ -135,11 +138,37 @@ public class Player {
             stateTime += delta;
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+            interactionManager.tryInteract(this, world);
+        }
+
     }
 
+    public Rectangle getFrontTile () {
+
+        int px = (int) x / TILE_SIZE;
+        int py = (int) y / TILE_SIZE;
+
+        switch (direction) {
+            case FORWARD  : py -= 1; break;
+            case BACKWARD : py += 1; break;
+            case RIGHT    : px += 1; break;
+            case LEFT     : px -= 1; break;
+        }
+
+        return new Rectangle(px * TILE_SIZE, py * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+
+    }
+
+    @Override
     public void render (SpriteBatch spriteBatch) {
         TextureRegion frame = currentAnimation.getKeyFrame(stateTime, true);
         spriteBatch.draw(frame, x, y);
+    }
+
+    @Override
+    public float getY() {
+        return y;
     }
 
     public void dispose() {
