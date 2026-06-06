@@ -21,4 +21,4 @@ com.kean.singkamasvalley
     └── AssetManager.java
 
 
-// fix Array vs world grid mismatch
+1) Add a game service class for easier parameters

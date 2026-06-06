@@ -1,7 +1,6 @@
 package com.kean.singkamasvalley.world;
 
 import com.badlogic.gdx.utils.Array;
-import com.kean.singkamasvalley.entities.WorldObject;
 
 public class World {
 
@@ -30,6 +29,10 @@ public class World {
 
     public void addObject(WorldObject obj) {
         objects.add(obj);
+    }
+
+    public void removeObject(WorldObject obj) {
+        objects.removeValue(obj, true);
     }
 
     public Array<WorldObject> getObjects() {

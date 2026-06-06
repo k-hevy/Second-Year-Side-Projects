@@ -7,16 +7,17 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.kean.singkamasvalley.assets.GameAssets;
 import com.kean.singkamasvalley.inventory.Inventory;
-import com.kean.singkamasvalley.inventory.Item;
-import com.kean.singkamasvalley.inventory.ItemStack;
-import com.kean.singkamasvalley.inventory.ItemType;
-import com.kean.singkamasvalley.inventory.items.HoeItem;
-import com.kean.singkamasvalley.inventory.items.WoodItem;
+import com.kean.singkamasvalley.inventory.items.ItemDatabase;
+import com.kean.singkamasvalley.inventory.items.ItemDefinition;
+import com.kean.singkamasvalley.inventory.items.ItemStack;
 import com.kean.singkamasvalley.managers.CollisionManager;
 import com.kean.singkamasvalley.managers.InteractionManager;
 import com.kean.singkamasvalley.world.GameTile;
 import com.kean.singkamasvalley.world.World;
+
+import java.util.Random;
 
 public class Player implements Renderable {
 
@@ -45,15 +46,21 @@ public class Player implements Renderable {
     private final CollisionManager collisionManager;
     private final InteractionManager interactionManager;
     private final World world;
+
     private Inventory inventory;
+    private ItemDatabase itemDatabase;
+    private GameAssets gameAssets;
 
     public Player (World world, CollisionManager collisionManager,
-                   InteractionManager interactionManager) {
+                   InteractionManager interactionManager, ItemDatabase itemDatabase,
+                   GameAssets gameAssets) {
 
         this.x = 216;
         this.y = 200;
         this.collisionManager = collisionManager;
         this.interactionManager = interactionManager;
+        this.itemDatabase = itemDatabase;
+        this.gameAssets = gameAssets;
         this.world = world;
 
         hitbox = new Rectangle(x+2, y, 12, 8 ); //sprite = 16x16, hitbox = 12x8
@@ -149,12 +156,25 @@ public class Player implements Renderable {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
             for (ItemStack stack : inventory.getSlots()) {
-                System.out.println(stack.getItem().getType() + " x" + stack.getQuantity());
+                System.out.println(stack.getItem().getName() + " x" + stack.getQuantity());
             }
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
-            inventory.addItem(new WoodItem(), 20);
+            Random rand = new Random();
+
+            world.addObject(
+                new ItemEntity(gameAssets,
+                new ItemStack(itemDatabase.getItem("wood"), 1),
+                rand.nextFloat(200),
+                rand.nextFloat(200))
+            );
+            
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+            ItemDefinition wood = itemDatabase.getItem("stone");
+            inventory.addItem(wood, 20);
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
@@ -195,6 +215,10 @@ public class Player implements Renderable {
 
         return new Rectangle(px * TILE_SIZE, py * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 
     @Override

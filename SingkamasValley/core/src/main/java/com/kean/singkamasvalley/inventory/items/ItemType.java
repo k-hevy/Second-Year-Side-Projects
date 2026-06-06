@@ -1,4 +1,4 @@
-package com.kean.singkamasvalley.inventory;
+package com.kean.singkamasvalley.inventory.items;
 
 public enum ItemType {
     HOE,

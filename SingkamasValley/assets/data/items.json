@@ -1,0 +1,17 @@
+[
+  {
+    "id": "wood",
+    "name": "Wood",
+    "texture": "wood"
+  },
+  {
+    "id": "stone",
+    "name": "Stone",
+    "texture": "stone"
+  },
+  {
+    "id": "singkamas_seed",
+    "name": "Singkamas Seed",
+    "texture": "singkamas_seed"
+  }
+]

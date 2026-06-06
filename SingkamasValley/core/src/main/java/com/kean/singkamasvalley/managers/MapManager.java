@@ -10,8 +10,6 @@ import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.kean.singkamasvalley.entities.WorldObject;
-import com.kean.singkamasvalley.world.World;
 
 public class MapManager {
 

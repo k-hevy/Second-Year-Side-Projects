@@ -1,6 +1,4 @@
-package com.kean.singkamasvalley.entities;
-
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+package com.kean.singkamasvalley.world;
 
 import com.badlogic.gdx.math.Rectangle;
 

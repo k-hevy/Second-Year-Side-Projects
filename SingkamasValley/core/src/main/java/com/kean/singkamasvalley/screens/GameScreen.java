@@ -5,15 +5,18 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.kean.singkamasvalley.assets.GameAssets;
 import com.kean.singkamasvalley.entities.Chest;
+import com.kean.singkamasvalley.entities.ItemEntity;
 import com.kean.singkamasvalley.entities.Player;
-import com.kean.singkamasvalley.managers.CollisionManager;
-import com.kean.singkamasvalley.managers.InteractionManager;
-import com.kean.singkamasvalley.managers.MapManager;
-import com.kean.singkamasvalley.managers.RenderManager;
+import com.kean.singkamasvalley.inventory.items.ItemDatabase;
+import com.kean.singkamasvalley.inventory.items.ItemDefinition;
+import com.kean.singkamasvalley.inventory.items.ItemStack;
+import com.kean.singkamasvalley.managers.*;
 import com.kean.singkamasvalley.world.World;
 
 public class GameScreen implements Screen {
@@ -28,6 +31,11 @@ public class GameScreen implements Screen {
     private InteractionManager interactionManager;
     private World world;
     private static final int TILE_SIZE = 16;
+    private GameAssets gameAssets;
+    private ItemDatabase itemDatabase;
+    private PickupManager pickupManager;
+
+    private Texture woodTex;
 
     public GameScreen () {}
 
@@ -51,11 +59,17 @@ public class GameScreen implements Screen {
         interactionManager = new InteractionManager();
         renderManager = new RenderManager();
 
-        Chest chest = new Chest(200, 200);
-        world.addObject(chest);
-        interactionManager.register(chest);
 
-        player = new Player(world, collisionManager, interactionManager);
+        gameAssets = new GameAssets();
+        itemDatabase = new ItemDatabase();
+        gameAssets.load();
+
+//        Chest chest = new Chest(200, 200);
+//        world.addObject(chest);
+//        interactionManager.register(chest);
+
+        player = new Player(world, collisionManager, interactionManager, itemDatabase, gameAssets);
+        pickupManager = new PickupManager(world);
 
     }
 
@@ -87,6 +101,8 @@ public class GameScreen implements Screen {
         shapeRenderer.rect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
         shapeRenderer.rect(front.x, front.y, front.width, front.height);
         shapeRenderer.end(); // seperate this from spritebatch cuz causes issues
+
+        pickupManager.checkPickup(player);
     }
 
     @Override public void resize(int width, int height) {
@@ -100,6 +116,7 @@ public class GameScreen implements Screen {
     @Override public void dispose() {
         spriteBatch.dispose();
         player.dispose();
+        gameAssets.dispose();
     }
 
 }
