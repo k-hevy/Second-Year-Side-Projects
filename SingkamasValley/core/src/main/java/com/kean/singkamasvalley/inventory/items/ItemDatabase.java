@@ -30,7 +30,15 @@ public class ItemDatabase {
     }
 
     public ItemDefinition getItem(String id) {
-        return items.get(id);
+
+        ItemDefinition item = items.get(id);
+
+        if (item == null) {
+            ItemDefinition fallback = items.get("error_item");
+            return fallback;
+        }
+
+        return item;
     }
 
     public ObjectMap <String, ItemDefinition> getItems() {

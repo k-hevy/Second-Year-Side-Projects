@@ -22,3 +22,7 @@ com.kean.singkamasvalley
 
 
 1) Add a game service class for easier parameters
+2) Add a control system
+3) Add new animations for idle
+4) add new animations for using weapons
+5) revise assets manager since everything needs to be loaded oneby one

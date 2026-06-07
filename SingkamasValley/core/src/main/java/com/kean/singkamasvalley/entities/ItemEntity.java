@@ -9,14 +9,14 @@ import com.kean.singkamasvalley.world.WorldObject;
 
 public class ItemEntity extends WorldObject implements Renderable {
 
-    private Rectangle bounds;
-    private ItemStack itemStack;
     private GameAssets assets;
+    private ItemStack itemStack;
     private float x, y;
+    private Rectangle bounds;
 
     public ItemEntity(GameAssets assets, ItemStack itemStack, float x, float y) {
-        this.itemStack = itemStack;
         this.assets = assets;
+        this.itemStack = itemStack;
         this.x = x;
         this.y = y;
         bounds = new Rectangle(x, y, 12, 12);
@@ -38,8 +38,8 @@ public class ItemEntity extends WorldObject implements Renderable {
 
     @Override
     public void render(SpriteBatch spriteBatch) {
-        Texture tex = assets.getTexture(itemStack.getItem().getTexture()) ;
-        spriteBatch.draw(tex, x, y, 12, 12);
+            Texture tex = assets.getTexture(itemStack.getItem().getTexture());
+            spriteBatch.draw(tex, x, y, 12, 12);
     }
 
 }

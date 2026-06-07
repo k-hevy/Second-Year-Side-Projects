@@ -2,16 +2,25 @@
   {
     "id": "wood",
     "name": "Wood",
-    "texture": "wood"
+    "texture": "wood",
+    "toolType" : "HOE"
   },
   {
     "id": "stone",
     "name": "Stone",
-    "texture": "stone"
+    "texture": "stone",
+    "toolType" : "AXE"
   },
   {
     "id": "singkamas_seed",
     "name": "Singkamas Seed",
-    "texture": "singkamas_seed"
+    "texture": "singkamas_seed",
+    "toolType" : "PICKAXE"
+  },
+  {
+    "id": "error_item",
+    "name": "error_item",
+    "texture": "error_item",
+    "toolType" : "NONE"
   }
 ]

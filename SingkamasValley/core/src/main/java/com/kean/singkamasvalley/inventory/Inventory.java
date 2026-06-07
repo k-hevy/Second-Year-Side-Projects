@@ -8,6 +8,9 @@ public class Inventory {
 
     private Array<ItemStack> slots;
 
+    public static final int HOTBAR_SIZE = 12;
+    public static final int INVENTORY_SIZE = 24;
+
     public Inventory () {
         slots = new Array<>();
     }

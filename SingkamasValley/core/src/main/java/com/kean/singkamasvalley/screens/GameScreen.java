@@ -10,17 +10,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.kean.singkamasvalley.assets.GameAssets;
-import com.kean.singkamasvalley.entities.Chest;
-import com.kean.singkamasvalley.entities.ItemEntity;
 import com.kean.singkamasvalley.entities.Player;
 import com.kean.singkamasvalley.inventory.items.ItemDatabase;
-import com.kean.singkamasvalley.inventory.items.ItemDefinition;
-import com.kean.singkamasvalley.inventory.items.ItemStack;
 import com.kean.singkamasvalley.managers.*;
+import com.kean.singkamasvalley.ui.UIManager;
 import com.kean.singkamasvalley.world.World;
 
 public class GameScreen implements Screen {
 
+    public static final int TILE_SIZE = 16;
     private SpriteBatch spriteBatch;
     private Player player;
     private OrthographicCamera camera;
@@ -30,11 +28,10 @@ public class GameScreen implements Screen {
     private RenderManager renderManager;
     private InteractionManager interactionManager;
     private World world;
-    private static final int TILE_SIZE = 16;
     private GameAssets gameAssets;
     private ItemDatabase itemDatabase;
     private PickupManager pickupManager;
-
+    private UIManager uiManager;
     private Texture woodTex;
 
     public GameScreen () {}
@@ -60,6 +57,7 @@ public class GameScreen implements Screen {
         renderManager = new RenderManager();
 
 
+
         gameAssets = new GameAssets();
         itemDatabase = new ItemDatabase();
         gameAssets.load();
@@ -70,6 +68,9 @@ public class GameScreen implements Screen {
 
         player = new Player(world, collisionManager, interactionManager, itemDatabase, gameAssets);
         pickupManager = new PickupManager(world);
+
+        uiManager = new UIManager(player.getInventory(), player.getHotbar());
+
 
     }
 
@@ -92,6 +93,8 @@ public class GameScreen implements Screen {
         mapManager.render(camera, spriteBatch);
         renderManager.render(spriteBatch, world, player); // renders entities like player
         spriteBatch.end();
+
+        uiManager.render(spriteBatch); // has own Spritebatch, should be outside of prior spritebatch
 
         Rectangle hitbox = player.getHitBox();
         Rectangle front = player.getFrontTile();

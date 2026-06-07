@@ -17,6 +17,7 @@ public class GameAssets {
         loadTexture("wood");
         loadTexture("axe");
         loadTexture("singkamas_seed");
+        loadTexture("error_item");
     }
 
     public void loadTexture(String name) {

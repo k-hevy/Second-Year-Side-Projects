@@ -14,6 +14,8 @@ import com.kean.singkamasvalley.inventory.items.ItemDefinition;
 import com.kean.singkamasvalley.inventory.items.ItemStack;
 import com.kean.singkamasvalley.managers.CollisionManager;
 import com.kean.singkamasvalley.managers.InteractionManager;
+import com.kean.singkamasvalley.managers.ToolManager;
+import com.kean.singkamasvalley.ui.Hotbar;
 import com.kean.singkamasvalley.world.GameTile;
 import com.kean.singkamasvalley.world.World;
 
@@ -21,14 +23,8 @@ import java.util.Random;
 
 public class Player implements Renderable {
 
-    private enum Direction {
-        FORWARD,
-        BACKWARD,
-        LEFT,
-        RIGHT
-    }
-
-    private Direction direction = Direction.FORWARD;
+    private Direction direction;
+    private PlayerState state;
 
     private Rectangle hitbox;
 
@@ -48,8 +44,11 @@ public class Player implements Renderable {
     private final World world;
 
     private Inventory inventory;
+    private Hotbar hotbar;
     private ItemDatabase itemDatabase;
     private GameAssets gameAssets;
+    private ToolManager toolManager;
+
 
     public Player (World world, CollisionManager collisionManager,
                    InteractionManager interactionManager, ItemDatabase itemDatabase,
@@ -62,6 +61,11 @@ public class Player implements Renderable {
         this.itemDatabase = itemDatabase;
         this.gameAssets = gameAssets;
         this.world = world;
+
+        direction = Direction.FORWARD;
+        state = PlayerState.IDLE;
+
+
 
         hitbox = new Rectangle(x+2, y, 12, 8 ); //sprite = 16x16, hitbox = 12x8
 
@@ -79,8 +83,10 @@ public class Player implements Renderable {
         walkLeft = new Animation<>(0.15f, tmp[3]);
 
         currentAnimation = walkForward;
+        toolManager = new ToolManager();
 
         inventory = new Inventory();
+        hotbar = new Hotbar(this.getInventory());
 
     }
 
@@ -106,6 +112,10 @@ public class Player implements Renderable {
 
     public void update(float delta) {
 
+//        System.out.println(direction);
+//        System.out.println(state);
+
+        hotbar.update();
         boolean moving = false;
 
         float newX = x;
@@ -134,6 +144,12 @@ public class Player implements Renderable {
             moving = true;
         }
 
+        if (moving) {
+            state = PlayerState.WALKING;
+        } else {
+            state = PlayerState.IDLE;
+        }
+
         hitbox.setPosition(newX + 2, newY); // sets hitbox adv but when player is blocks regresses
 
         if (!collisionManager.isBlocked(hitbox)) {
@@ -154,47 +170,61 @@ public class Player implements Renderable {
         }
 
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
-            for (ItemStack stack : inventory.getSlots()) {
-                System.out.println(stack.getItem().getName() + " x" + stack.getQuantity());
-            }
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
             Random rand = new Random();
 
             world.addObject(
                 new ItemEntity(gameAssets,
-                new ItemStack(itemDatabase.getItem("wood"), 1),
+                new ItemStack(itemDatabase.getItem("woodsps"), 1),
                 rand.nextFloat(200),
                 rand.nextFloat(200))
             );
-            
+
+            world.addObject(
+                new ItemEntity(gameAssets,
+                    new ItemStack(itemDatabase.getItem("singkamas_seed"), 1),
+                    rand.nextFloat(200),
+                    rand.nextFloat(200))
+            );
+
+            world.addObject(
+                new ItemEntity(gameAssets,
+                    new ItemStack(itemDatabase.getItem("stone"), 1),
+                    rand.nextFloat(200),
+                    rand.nextFloat(200))
+            );
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
-            ItemDefinition wood = itemDatabase.getItem("stone");
-            inventory.addItem(wood, 20);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+            ItemStack selected = getHotbar().getSelectedItem();
+            if (selected == null) return;
+            ItemDefinition item = selected.getItem();
+            System.out.println(item.getToolType());
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            interactionManager.tryInteract(this, world);
-        }
+
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+//            interactionManager.tryInteract(this, world);
+//        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
-            Rectangle frontTile = getFrontTile();
-            int tileX = (int) frontTile.x / 16;
-            int tileY = (int) frontTile.y / 16;
 
-            GameTile tile = world.getTile(tileX, tileY);
-
-            if (tile !=  null && !tile.isTilled()) {
-                tile.setTilled(true);
-                System.out.println("Sucecsfully tiled");
-            } else if (tile !=  null && tile.isTilled()) {
-                tile.setTilled(false);
-                System.out.println("Sucecsfully untiled");
-            }
+            toolManager.useTool(this, world);
+//
+//
+//            Rectangle frontTile = getFrontTile();
+//            int tileX = (int) frontTile.x / 16;
+//            int tileY = (int) frontTile.y / 16;
+//
+//            GameTile tile = world.getTile(tileX, tileY);
+//
+//            if (tile !=  null && !tile.isTilled()) {
+//                tile.setTilled(true);
+//                System.out.println("Sucecsfully tiled");
+//            } else if (tile !=  null && tile.isTilled()) {
+//                tile.setTilled(false);
+//                System.out.println("Sucecsfully untiled");
+//            }
 
         }
 
@@ -219,6 +249,10 @@ public class Player implements Renderable {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public Hotbar getHotbar() {
+        return hotbar;
     }
 
     @Override
