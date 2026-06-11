@@ -14,6 +14,8 @@ import com.kean.singkamasvalley.entities.Player;
 import com.kean.singkamasvalley.inventory.items.ItemDatabase;
 import com.kean.singkamasvalley.managers.*;
 import com.kean.singkamasvalley.ui.UIManager;
+import com.kean.singkamasvalley.world.TileRenderer;
+import com.kean.singkamasvalley.world.TileTexture;
 import com.kean.singkamasvalley.world.World;
 
 public class GameScreen implements Screen {
@@ -33,6 +35,8 @@ public class GameScreen implements Screen {
     private PickupManager pickupManager;
     private UIManager uiManager;
     private Texture woodTex;
+    private TileRenderer tileRenderer;
+    private TileTexture tileTexture;
 
     public GameScreen () {}
 
@@ -55,8 +59,8 @@ public class GameScreen implements Screen {
 
         interactionManager = new InteractionManager();
         renderManager = new RenderManager();
-
-
+        tileTexture = new TileTexture();
+        tileRenderer = new TileRenderer(tileTexture);
 
         gameAssets = new GameAssets();
         itemDatabase = new ItemDatabase();
@@ -91,6 +95,7 @@ public class GameScreen implements Screen {
         // Rendering World
         spriteBatch.begin(); // starts drawing
         mapManager.render(camera, spriteBatch);
+        tileRenderer.render(world, spriteBatch);
         renderManager.render(spriteBatch, world, player); // renders entities like player
         spriteBatch.end();
 

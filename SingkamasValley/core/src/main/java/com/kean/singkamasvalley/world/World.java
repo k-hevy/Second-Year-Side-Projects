@@ -39,5 +39,13 @@ public class World {
         return objects;
     }
 
+    public int getHeight() {
+        return tiles[0].length;
+    }
+
+    public int getWidth() {
+        return tiles.length;
+    }
+
 
 }

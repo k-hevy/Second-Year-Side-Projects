@@ -16,7 +16,6 @@ import com.kean.singkamasvalley.managers.CollisionManager;
 import com.kean.singkamasvalley.managers.InteractionManager;
 import com.kean.singkamasvalley.managers.ToolManager;
 import com.kean.singkamasvalley.ui.Hotbar;
-import com.kean.singkamasvalley.world.GameTile;
 import com.kean.singkamasvalley.world.World;
 
 import java.util.Random;
@@ -26,28 +25,28 @@ public class Player implements Renderable {
     private Direction direction;
     private PlayerState state;
 
-    private Rectangle hitbox;
+    private final Rectangle hitbox;
 
     private float x, y;
-    private final Texture playerSpriteSheet;
     private float stateTime;
     private final int TILE_SIZE = 16;
 
-    private final Animation<TextureRegion> walkBackward;
-    private final Animation<TextureRegion> walkForward;
-    private final Animation<TextureRegion> walkLeft;
-    private final Animation<TextureRegion> walkRight;
-    private Animation<TextureRegion> currentAnimation;
+    private final Texture walkSheet;
+    private final Texture idleSheet;
+    private final Texture useToolSheet;
 
     private final CollisionManager collisionManager;
     private final InteractionManager interactionManager;
     private final World world;
 
-    private Inventory inventory;
-    private Hotbar hotbar;
-    private ItemDatabase itemDatabase;
-    private GameAssets gameAssets;
-    private ToolManager toolManager;
+    private final Inventory inventory;
+    private final Hotbar hotbar;
+    private final ItemDatabase itemDatabase;
+    private final  GameAssets gameAssets;
+    private final  ToolManager toolManager;
+    private final  PlayerAnimationSet animationSet;
+
+    private boolean toolApplied;
 
 
     public Player (World world, CollisionManager collisionManager,
@@ -64,25 +63,46 @@ public class Player implements Renderable {
 
         direction = Direction.FORWARD;
         state = PlayerState.IDLE;
-
-
-
         hitbox = new Rectangle(x+2, y, 12, 8 ); //sprite = 16x16, hitbox = 12x8
 
-        playerSpriteSheet = new Texture("player_walking_sheet.png");
+        animationSet = new PlayerAnimationSet();
+        walkSheet = new Texture("player/player_walking_sheet.png");
+        idleSheet = new Texture("player/player_idle_sheet.png");
+        useToolSheet = new Texture("player/player_using_tool_sheet.png");
 
-        TextureRegion[][] tmp = TextureRegion.split(
-            playerSpriteSheet,
-            playerSpriteSheet.getWidth() / 4,
-            playerSpriteSheet.getHeight() / 4
+        TextureRegion[][] walkGrid = TextureRegion.split(
+            walkSheet,
+            walkSheet.getWidth() / 4,
+            walkSheet.getHeight() / 4
         );
 
-        walkForward = new Animation<>(0.15f, tmp[0]);
-        walkBackward = new Animation<>(0.15f, tmp[1]);
-        walkRight = new Animation<>(0.15f, tmp[2]);
-        walkLeft = new Animation<>(0.15f, tmp[3]);
+        TextureRegion[][] idleGrid = TextureRegion.split(
+            idleSheet,
+            idleSheet.getWidth() / 4,
+            idleSheet.getHeight() / 4
+        );
 
-        currentAnimation = walkForward;
+        TextureRegion[][] useToolGrid = TextureRegion.split(
+            useToolSheet,
+            useToolSheet.getWidth() / 6,
+            useToolSheet.getHeight() / 4
+        );
+
+        animationSet.walkDown  = new Animation<>(0.15f, walkGrid[0]);
+        animationSet.walkUp    = new Animation<>(0.15f, walkGrid[1]);
+        animationSet.walkRight = new Animation<>(0.15f, walkGrid[2]);
+        animationSet.walkLeft  = new Animation<>(0.15f, walkGrid[3]);
+
+        animationSet.idleDown  = new Animation<>(0.45f, idleGrid[0]);
+        animationSet.idleUp  = new Animation<>(0.45f, idleGrid[1]);
+        animationSet.idleRight  = new Animation<>(0.45f, idleGrid[2]);
+        animationSet.idleLeft  = new Animation<>(0.45f, idleGrid[3]);
+
+        animationSet.toolDown  = new Animation<>(0.08f, useToolGrid[0]);
+        animationSet.toolUp  = new Animation<>(0.08f, useToolGrid[1]);
+        animationSet.toolRight  = new Animation<>(0.08f, useToolGrid[2]);
+        animationSet.toolLeft  = new Animation<>(0.08f, useToolGrid[3]);
+
         toolManager = new ToolManager();
 
         inventory = new Inventory();
@@ -112,42 +132,45 @@ public class Player implements Renderable {
 
     public void update(float delta) {
 
-//        System.out.println(direction);
-//        System.out.println(state);
+        if (state == PlayerState.USING_TOOL) {
+            updateToolAnimation(delta);
+            return;
+        } // locks the animation
 
         hotbar.update();
-        boolean moving = false;
 
         float newX = x;
         float newY = y;
 
         float speed = 100f;
 
+        state = PlayerState.IDLE;
+
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             newY += speed * delta;
             direction = Direction.BACKWARD;
-            moving = true;
+            state = PlayerState.WALKING;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             newX += speed * delta;
             direction = Direction.RIGHT;
-            moving = true;
+            state = PlayerState.WALKING;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             newY -= speed * delta;
             direction = Direction.FORWARD;
-            moving = true;
+            state = PlayerState.WALKING;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             newX -= speed * delta;
             direction = Direction.LEFT;
-            moving = true;
+            state = PlayerState.WALKING;
         }
 
-        if (moving) {
-            state = PlayerState.WALKING;
-        } else {
-            state = PlayerState.IDLE;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) { // Hit
+            state = PlayerState.USING_TOOL;
+            toolApplied = false;
+            stateTime = 0;
         }
 
         hitbox.setPosition(newX + 2, newY); // sets hitbox adv but when player is blocks regresses
@@ -158,24 +181,12 @@ public class Player implements Renderable {
             updateHitBox(x, y);
         }
 
-        switch(direction) {
-            case FORWARD  : currentAnimation = walkForward; break;
-            case BACKWARD : currentAnimation = walkBackward; break;
-            case RIGHT    : currentAnimation = walkRight; break;
-            case LEFT     : currentAnimation = walkLeft; break;
-        }
-
-        if (moving) {
-            stateTime += delta;
-        }
-
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
             Random rand = new Random();
 
             world.addObject(
                 new ItemEntity(gameAssets,
-                new ItemStack(itemDatabase.getItem("woodsps"), 1),
+                new ItemStack(itemDatabase.getItem("wood"), 1),
                 rand.nextFloat(200),
                 rand.nextFloat(200))
             );
@@ -200,34 +211,64 @@ public class Player implements Renderable {
             if (selected == null) return;
             ItemDefinition item = selected.getItem();
             System.out.println(item.getToolType());
-        }
+        } // says what item the user selects
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) { interactionManager.tryInteract(this, world); }
 
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-//            interactionManager.tryInteract(this, world);
-//        }
+        stateTime += delta;
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+    }
 
+    public void updateToolAnimation(float delta) {
+
+        stateTime += delta;
+
+        if (!toolApplied && stateTime >= 0.24f) {
+            System.out.println("Impact");
             toolManager.useTool(this, world);
-//
-//
-//            Rectangle frontTile = getFrontTile();
-//            int tileX = (int) frontTile.x / 16;
-//            int tileY = (int) frontTile.y / 16;
-//
-//            GameTile tile = world.getTile(tileX, tileY);
-//
-//            if (tile !=  null && !tile.isTilled()) {
-//                tile.setTilled(true);
-//                System.out.println("Sucecsfully tiled");
-//            } else if (tile !=  null && tile.isTilled()) {
-//                tile.setTilled(false);
-//                System.out.println("Sucecsfully untiled");
-//            }
-
+            toolApplied = true;
         }
 
+        Animation<TextureRegion> current = switch(direction) {
+            case FORWARD -> animationSet.toolDown;
+            case BACKWARD -> animationSet.toolUp;
+            case LEFT -> animationSet.toolLeft;
+            case RIGHT -> animationSet.toolRight;
+        };
+
+        if (current.isAnimationFinished(stateTime)) {
+            state = PlayerState.IDLE;
+            stateTime = 0;
+            toolApplied = false;
+        }
+    }
+
+    public TextureRegion getCurrentFrame() {
+
+        return switch (state) {
+
+            case WALKING -> switch (direction) {
+                case FORWARD   -> animationSet.walkDown.getKeyFrame(stateTime, true);
+                case BACKWARD  -> animationSet.walkUp.getKeyFrame(stateTime, true);
+                case LEFT      -> animationSet.walkLeft.getKeyFrame(stateTime, true);
+                case RIGHT     -> animationSet.walkRight.getKeyFrame(stateTime, true);
+            };
+
+            case USING_TOOL -> switch (direction) {
+                case FORWARD   -> animationSet.toolDown.getKeyFrame(stateTime);
+                case BACKWARD  -> animationSet.toolUp.getKeyFrame(stateTime);
+                case LEFT      -> animationSet.toolLeft.getKeyFrame(stateTime);
+                case RIGHT     -> animationSet.toolRight.getKeyFrame(stateTime);
+            };
+
+            case IDLE -> switch (direction) {
+                case FORWARD   -> animationSet.idleDown.getKeyFrame(stateTime, true);
+                case BACKWARD  -> animationSet.idleUp.getKeyFrame(stateTime, true);
+                case LEFT      -> animationSet.idleLeft.getKeyFrame(stateTime, true);
+                case RIGHT     -> animationSet.idleRight.getKeyFrame(stateTime, true);
+            };
+
+        };
 
     }
 
@@ -257,8 +298,7 @@ public class Player implements Renderable {
 
     @Override
     public void render (SpriteBatch spriteBatch) {
-        TextureRegion frame = currentAnimation.getKeyFrame(stateTime, true);
-        spriteBatch.draw(frame, x, y);
+        spriteBatch.draw(getCurrentFrame(), x, y);
     }
 
     @Override
@@ -267,6 +307,8 @@ public class Player implements Renderable {
     }
 
     public void dispose() {
-        playerSpriteSheet.dispose();
+        walkSheet.dispose();
+        idleSheet.dispose();
+        useToolSheet.dispose();
     }
 }
