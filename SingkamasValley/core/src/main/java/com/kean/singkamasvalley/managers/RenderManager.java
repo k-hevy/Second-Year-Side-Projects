@@ -3,7 +3,7 @@ package com.kean.singkamasvalley.managers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.kean.singkamasvalley.entities.Player;
 import com.kean.singkamasvalley.entities.Renderable;
-import com.kean.singkamasvalley.world.WorldObject;
+import com.kean.singkamasvalley.world.objects.WorldObject;
 import com.kean.singkamasvalley.world.World;
 
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ public class RenderManager {
         renderables.clear();
 
         for (WorldObject obj : world.getObjects()) {
-            if (obj instanceof Renderable) {
-                renderables.add((Renderable) obj);
+            if (obj != null) {
+                renderables.add(obj);
             }
         }
         renderables.add(player);

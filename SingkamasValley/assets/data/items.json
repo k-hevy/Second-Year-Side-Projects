@@ -9,13 +9,25 @@
     "id": "stone",
     "name": "Stone",
     "texture": "stone",
-    "toolType" : "AXE"
+    "toolType" : "NONE"
   },
   {
     "id": "singkamas_seed",
     "name": "Singkamas Seed",
     "texture": "singkamas_seed",
-    "toolType" : "PICKAXE"
+    "toolType" : "NONE"
+  },
+  {
+    "id": "watering_can",
+    "name": "watering_can",
+    "texture": "watering_can",
+    "toolType" : "WATERING_CAN"
+  },
+  {
+    "id": "hoe",
+    "name": "hoe",
+    "texture": "hoe",
+    "toolType" : "HOE"
   },
   {
     "id": "error_item",

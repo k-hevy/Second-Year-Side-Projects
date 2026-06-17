@@ -1,11 +1,11 @@
 package com.kean.singkamasvalley.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -14,9 +14,9 @@ import com.kean.singkamasvalley.entities.Player;
 import com.kean.singkamasvalley.inventory.items.ItemDatabase;
 import com.kean.singkamasvalley.managers.*;
 import com.kean.singkamasvalley.ui.UIManager;
-import com.kean.singkamasvalley.world.TileRenderer;
-import com.kean.singkamasvalley.world.TileTexture;
-import com.kean.singkamasvalley.world.World;
+import com.kean.singkamasvalley.world.*;
+import com.kean.singkamasvalley.world.objects.CropLoader;
+import com.kean.singkamasvalley.world.objects.CropManager;
 
 public class GameScreen implements Screen {
 
@@ -34,9 +34,11 @@ public class GameScreen implements Screen {
     private ItemDatabase itemDatabase;
     private PickupManager pickupManager;
     private UIManager uiManager;
-    private Texture woodTex;
     private TileRenderer tileRenderer;
     private TileTexture tileTexture;
+    private DayManager dayManager;
+    private CropManager cropManager;
+    private CropLoader cropLoader;
 
     public GameScreen () {}
 
@@ -52,10 +54,7 @@ public class GameScreen implements Screen {
         mapManager = new MapManager(spriteBatch);
         collisionManager = new CollisionManager(mapManager.getTiledMap());
 
-        int i = mapManager.getTiledMap().getProperties().get("width", Integer.class);
-
-        world = new World(mapManager.getTiledMap().getProperties().get("width", Integer.class),
-            mapManager.getTiledMap().getProperties().get("height", Integer.class));
+        world = WorldBuilder.build(mapManager.getTiledMap());
 
         interactionManager = new InteractionManager();
         renderManager = new RenderManager();
@@ -74,12 +73,21 @@ public class GameScreen implements Screen {
         pickupManager = new PickupManager(world);
 
         uiManager = new UIManager(player.getInventory(), player.getHotbar());
+        dayManager = new DayManager();
+        cropManager = new CropManager();
+        CropLoader.load();
 
 
     }
 
     @Override
     public void render(float delta) {
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+            dayManager.nextDay();
+            cropManager.advanceDay(world);
+            System.out.println("Day: " + dayManager.getCurrentDay());
+        }
 
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f );
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

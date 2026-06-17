@@ -4,22 +4,26 @@
   <image source="ground.png" width="16" height="64"/>
   <tile id="0">
    <properties>
+    <property name="TYPE" value="GRASS"/>
     <property name="solid" type="bool" value="false"/>
     <property name="tillable" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="1">
    <properties>
+    <property name="TYPE" value="PATH"/>
     <property name="solid" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="2">
    <properties>
+    <property name="TYPE" value="WATER"/>
     <property name="solid" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="3">
    <properties>
+    <property name="TYPE" value="GRASS"/>
     <property name="solid" type="bool" value="false"/>
    </properties>
   </tile>

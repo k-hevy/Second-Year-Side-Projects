@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.kean.singkamasvalley.entities.Interactable;
 import com.kean.singkamasvalley.entities.Player;
-import com.kean.singkamasvalley.world.WorldObject;
+import com.kean.singkamasvalley.world.objects.WorldObject;
 import com.kean.singkamasvalley.world.World;
 
 public class InteractionManager {

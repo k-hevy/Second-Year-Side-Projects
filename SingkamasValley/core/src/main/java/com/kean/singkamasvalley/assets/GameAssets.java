@@ -13,9 +13,16 @@ public class GameAssets {
     }
 
     public void load() {
+
         loadTexture("stone");
+
         loadTexture("wood");
+
+        //Tools
+        loadTexture("hoe");
         loadTexture("axe");
+        loadTexture("watering_can");
+
         loadTexture("singkamas_seed");
         loadTexture("error_item");
     }

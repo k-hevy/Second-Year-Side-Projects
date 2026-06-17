@@ -34,8 +34,7 @@ public class ItemDatabase {
         ItemDefinition item = items.get(id);
 
         if (item == null) {
-            ItemDefinition fallback = items.get("error_item");
-            return fallback;
+            return items.get("error_item");
         }
 
         return item;

@@ -1,4 +1,4 @@
-package com.kean.singkamasvalley.managers;
+package com.kean.singkamasvalley.world;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -57,5 +57,6 @@ public class MapManager {
         map.dispose();
         renderer.dispose();
     } // when changing levels or maps
+
 
 }

@@ -1,11 +1,10 @@
 package com.kean.singkamasvalley.managers;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.SnapshotArray;
-import com.kean.singkamasvalley.entities.ItemEntity;
+import com.kean.singkamasvalley.inventory.items.ItemEntity;
 import com.kean.singkamasvalley.entities.Player;
 import com.kean.singkamasvalley.world.World;
-import com.kean.singkamasvalley.world.WorldObject;
+import com.kean.singkamasvalley.world.objects.WorldObject;
 
 import java.util.Iterator;
 

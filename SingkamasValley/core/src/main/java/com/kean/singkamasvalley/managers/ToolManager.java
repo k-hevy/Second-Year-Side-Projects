@@ -2,7 +2,6 @@ package com.kean.singkamasvalley.managers;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.kean.singkamasvalley.entities.Player;
-import com.kean.singkamasvalley.entities.ToolType;
 import com.kean.singkamasvalley.inventory.items.ItemDefinition;
 import com.kean.singkamasvalley.inventory.items.ItemStack;
 import com.kean.singkamasvalley.screens.GameScreen;
@@ -27,7 +26,7 @@ public class ToolManager {
         Rectangle frontTile = player.getFrontTile();
         int x = (int) frontTile.getX() / TILE_SIZE;
         int y = (int) frontTile.getY() / TILE_SIZE;
-        GameTile tile = world.getTile(x,y);
+        GameTile tile = world.getTile(x, y);
 
         switch(item.getToolType()) {
             case HOE : useHoe(tile); break;
@@ -48,8 +47,16 @@ public class ToolManager {
 
     }
 
+    public void useWatering_Can(GameTile tile) {
+        if (tile != null && tile.getType() == TileType.GRASS && tile.isTilled()) {
+            tile.setWatered(true);
+            System.out.println("watered");
+        }
+
+    }
+
     public void useAxe(GameTile tile) {}
     public void usePick(GameTile tile) {}
     public void useSword(GameTile tile) {}
-    public void useWatering_Can(GameTile tile) {}
+
 }

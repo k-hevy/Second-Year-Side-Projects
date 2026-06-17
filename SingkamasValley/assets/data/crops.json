@@ -1,0 +1,12 @@
+[
+  {
+    "type" : "SINGKAMAS",
+    "texture" : "crops/singkamas.png",
+    "daysToGrow" : 4
+  },
+  {
+    "type" : "PARSNIP",
+    "texture" : "crops/parsnip.png",
+    "daysToGrow" : 4
+  }
+]

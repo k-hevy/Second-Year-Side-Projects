@@ -11,12 +11,16 @@ import com.kean.singkamasvalley.assets.GameAssets;
 import com.kean.singkamasvalley.inventory.Inventory;
 import com.kean.singkamasvalley.inventory.items.ItemDatabase;
 import com.kean.singkamasvalley.inventory.items.ItemDefinition;
+import com.kean.singkamasvalley.inventory.items.ItemEntity;
 import com.kean.singkamasvalley.inventory.items.ItemStack;
 import com.kean.singkamasvalley.managers.CollisionManager;
 import com.kean.singkamasvalley.managers.InteractionManager;
 import com.kean.singkamasvalley.managers.ToolManager;
 import com.kean.singkamasvalley.ui.Hotbar;
+import com.kean.singkamasvalley.world.GameTile;
 import com.kean.singkamasvalley.world.World;
+import com.kean.singkamasvalley.world.objects.Crop;
+import com.kean.singkamasvalley.world.objects.CropType;
 
 import java.util.Random;
 
@@ -47,6 +51,7 @@ public class Player implements Renderable {
     private final  PlayerAnimationSet animationSet;
 
     private boolean toolApplied;
+    private Texture cropTex;
 
 
     public Player (World world, CollisionManager collisionManager,
@@ -186,25 +191,20 @@ public class Player implements Renderable {
 
             world.addObject(
                 new ItemEntity(gameAssets,
-                new ItemStack(itemDatabase.getItem("wood"), 1),
+                new ItemStack(itemDatabase.getItem("hoe"), 1),
                 rand.nextFloat(200),
                 rand.nextFloat(200))
             );
 
             world.addObject(
                 new ItemEntity(gameAssets,
-                    new ItemStack(itemDatabase.getItem("singkamas_seed"), 1),
+                    new ItemStack(itemDatabase.getItem("watering_can"), 1),
                     rand.nextFloat(200),
                     rand.nextFloat(200))
             );
 
-            world.addObject(
-                new ItemEntity(gameAssets,
-                    new ItemStack(itemDatabase.getItem("stone"), 1),
-                    rand.nextFloat(200),
-                    rand.nextFloat(200))
-            );
         }
+
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
             ItemStack selected = getHotbar().getSelectedItem();
@@ -212,6 +212,17 @@ public class Player implements Renderable {
             ItemDefinition item = selected.getItem();
             System.out.println(item.getToolType());
         } // says what item the user selects
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+            GameTile[][] tiles = world.getTiles();
+            System.out.println(tiles[(int) getFrontTile().getX() / 16][(int) getFrontTile().getY() / 16].getType());
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            world.addObject(new Crop(200, 200, CropType.SINGKAMAS));
+            System.out.println("Added plant");
+
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) { interactionManager.tryInteract(this, world); }
 
@@ -310,5 +321,6 @@ public class Player implements Renderable {
         walkSheet.dispose();
         idleSheet.dispose();
         useToolSheet.dispose();
+        cropTex.dispose();
     }
 }
